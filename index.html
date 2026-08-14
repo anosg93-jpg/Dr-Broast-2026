@@ -284,7 +284,7 @@
         .cart-item-price { color: var(--accent); font-weight: 900; font-size: 0.88rem; display: block; }
         .remove-btn { color: #ff3b30; font-weight: 800; font-size: 0.75rem; cursor: pointer; padding: 4px 8px; }
 
-        .order-type-container { display: flex; background: var(--bg); padding: 6px; border-radius: 16px; margin: 15px 0; gap: 6px; border: 1px solid var(--border-subtle); }
+        .order-type-container { display: flex; background: var(--bg); padding: 6px; border-radius: 16px; margin: 12px 0; gap: 6px; border: 1px solid var(--border-subtle); }
         .order-type-btn { flex: 1; border: none; background: transparent; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--desc-text); transition: all 0.3s ease; }
         .order-type-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
 
@@ -393,18 +393,42 @@
         <div class="modal-content">
             <h2 style="margin-bottom: 20px; font-weight: 900;">طلباتك</h2>
             <div id="cartItemsList"></div>
-            <div style="margin: 20px 0; padding: 16px; background: var(--accent-light); border: 1px solid var(--border-subtle); border-radius: 18px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin: 15px 0; padding: 16px; background: var(--accent-light); border: 1px solid var(--border-subtle); border-radius: 18px; display: flex; justify-content: space-between; align-items: center;">
                 <b style="font-size: 1.05rem;">المجموع الكلي</b>
                 <b id="totalAmount" style="color: var(--accent); font-size: 1.15rem;">0 ج.م</b>
             </div>
 
-            <!-- أزرار نوع الطلب -->
+            <!-- أزرار نوع الاستلام -->
             <div class="order-type-container">
                 <button type="button" class="order-type-btn active" id="deliveryBtn" onclick="setOrderType('delivery')">
                     🛵 دليفري
                 </button>
                 <button type="button" class="order-type-btn" id="takeawayBtn" onclick="setOrderType('takeaway')">
                     🛍️ تيك اواي
+                </button>
+            </div>
+
+            <!-- اختيار طريقة الدفع (فودافون كاش / إنستاباي) -->
+            <div style="margin-top: 15px; margin-bottom: 5px; font-weight: 800; font-size: 0.9rem; color: var(--main-text);">
+                💳 اختر طريقة الدفع:
+            </div>
+            <div class="order-type-container">
+                <button type="button" class="order-type-btn active" id="vfcashBtn" onclick="setPaymentMethod('vfcash')">
+                    📱 فودافون كاش
+                </button>
+                <button type="button" class="order-type-btn" id="instapayBtn" onclick="setPaymentMethod('instapay')">
+                    ⚡ إنستاباي
+                </button>
+            </div>
+
+            <!-- صندوق عرض الرقم وزر النسخ -->
+            <div id="paymentInfoBox" style="background: var(--bg); border: 1.5px dashed var(--border-subtle); padding: 10px 14px; border-radius: 14px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <span id="paymentMethodLabel" style="font-size: 0.8rem; font-weight: 700; color: var(--desc-text); display: block;">رقم التحويل (فودافون كاش):</span>
+                    <b id="paymentNumberDisplay" style="font-size: 1.02rem; color: var(--accent); letter-spacing: 0.5px;">01091669151</b>
+                </div>
+                <button type="button" onclick="copyPaymentNumber()" id="copyBtn" style="background: var(--accent-light); border: 1.5px solid var(--accent); color: var(--accent); padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
+                    📋 نسخ
                 </button>
             </div>
 
@@ -422,10 +446,14 @@
         const IMAGES_PATH = "./images/"; 
         const WA_PHONE = "201091669151"; 
         
+        const VF_CASH_NUM = "01091669151";
+        const INSTAPAY_NUM = "01124170157";
+        
         let menuData = [], cart = [];
         let currentTotal = 0; 
         let deferredPrompt;
         let selectedOrderType = 'delivery';
+        let selectedPaymentMethod = 'vfcash';
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -694,6 +722,59 @@
             }
         }
 
+        // دالة التبديل بين طرق الدفع
+        function setPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            const vfcashBtn = document.getElementById('vfcashBtn');
+            const instapayBtn = document.getElementById('instapayBtn');
+            const paymentLabel = document.getElementById('paymentMethodLabel');
+            const paymentNum = document.getElementById('paymentNumberDisplay');
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.innerText = '📋 نسخ';
+
+            if (method === 'vfcash') {
+                vfcashBtn.classList.add('active');
+                instapayBtn.classList.remove('active');
+                paymentLabel.innerText = 'رقم التحويل (فودافون كاش):';
+                paymentNum.innerText = VF_CASH_NUM;
+            } else {
+                instapayBtn.classList.add('active');
+                vfcashBtn.classList.remove('active');
+                paymentLabel.innerText = 'رقم التحويل (إنستاباي):';
+                paymentNum.innerText = INSTAPAY_NUM;
+            }
+        }
+
+        // دالة نسخ رقم الدفع للحافظة
+        function copyPaymentNumber() {
+            const num = selectedPaymentMethod === 'vfcash' ? VF_CASH_NUM : INSTAPAY_NUM;
+            const copyBtn = document.getElementById('copyBtn');
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(num).then(() => {
+                    copyBtn.innerText = 'تم النسخ ✓';
+                    setTimeout(() => { copyBtn.innerText = '📋 نسخ'; }, 2000);
+                }).catch(() => fallbackCopy(num, copyBtn));
+            } else {
+                fallbackCopy(num, copyBtn);
+            }
+        }
+
+        function fallbackCopy(text, btn) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                btn.innerText = 'تم النسخ ✓';
+                setTimeout(() => { btn.innerText = '📋 نسخ'; }, 2000);
+            } catch (err) {}
+            document.body.removeChild(textArea);
+        }
+
         function sendToWA() {
             const n = document.getElementById('uName').value.trim();
             const p = document.getElementById('uPhone').value.trim();
@@ -707,11 +788,13 @@
             }
 
             const typeLabel = selectedOrderType === 'delivery' ? '🛵 دليفري' : '🛍️ تيك اواي';
+            const payLabel = selectedPaymentMethod === 'vfcash' ? `📱 فودافون كاش (${VF_CASH_NUM})` : `⚡ إنستاباي (${INSTAPAY_NUM})`;
             
             let msg = `✨ *طلب جديد من مطعم Dr. Broast* ✨\n\n`;
             msg += `👤 *الاسم:* ${n}\n`;
             msg += `📱 *الهاتف:* ${p}\n`;
             msg += `📋 *نوع الطلب:* ${typeLabel}\n`;
+            msg += `💳 *طريقة الدفع:* ${payLabel}\n`;
             
             if (selectedOrderType === 'delivery') {
                 msg += `📍 *العنوان:* ${a}\n`;
