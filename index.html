@@ -285,7 +285,7 @@
         .remove-btn { color: #ff3b30; font-weight: 800; font-size: 0.75rem; cursor: pointer; padding: 4px 8px; }
 
         .order-type-container { display: flex; background: var(--bg); padding: 6px; border-radius: 16px; margin: 10px 0; gap: 6px; border: 1px solid var(--border-subtle); }
-        .order-type-btn { flex: 1; border: none; background: transparent; padding: 10px 4px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; color: var(--desc-text); transition: all 0.3s ease; white-space: nowrap; }
+        .order-type-btn { flex: 1; border: none; background: transparent; padding: 10px 4px; border-radius: 12px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; color: var(--desc-text); transition: all 0.3s ease; white-space: nowrap; }
         .order-type-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
 
         .user-fields input { background: var(--bg); border: 1px solid var(--border-subtle); padding: 16px; border-radius: 14px; width: 100%; margin-bottom: 10px; color: var(--main-text); text-align: right; font-weight: 600; outline: none; }
@@ -398,7 +398,7 @@
                 <b id="totalAmount" style="color: var(--accent); font-size: 1.15rem;">0 ج.م</b>
             </div>
 
-            <!-- أزرار نوع الطلب -->
+            <!-- أزرار نوع الطلب (دليفري / صالة / استلام من المطعم) -->
             <div class="order-type-container">
                 <button type="button" class="order-type-btn active" id="deliveryBtn" onclick="setOrderType('delivery')">
                     🛵 دليفري
@@ -411,33 +411,26 @@
                 </button>
             </div>
 
-            <!-- الاختيار الرئيسي لطريقة الدفع: نقدي / تحويل كاش -->
+            <!-- الاختيارات الثلاثة لطريقة الدفع جنباً إلى جنب في صف واحد -->
             <div style="margin-top: 15px; margin-bottom: 5px; font-weight: 800; font-size: 0.9rem; color: var(--main-text);">
                 💳 طريقة الدفع:
             </div>
             <div class="order-type-container">
-                <button type="button" class="order-type-btn active" id="payCashBtn" onclick="setMainPaymentType('cash')">
+                <button type="button" class="order-type-btn active" id="payCashBtn" onclick="setPaymentMethod('cash')">
                     💵 نقدي
                 </button>
-                <button type="button" class="order-type-btn" id="payTransferBtn" onclick="setMainPaymentType('transfer')">
-                    📱 تحويل كاش
+                <button type="button" class="order-type-btn" id="payVfBtn" onclick="setPaymentMethod('vfcash')">
+                    📱 فون كاش
+                </button>
+                <button type="button" class="order-type-btn" id="payInstaBtn" onclick="setPaymentMethod('instapay')">
+                    ⚡ إنستا باي
                 </button>
             </div>
 
-            <!-- الخيارات الفرعية للمحافظ الإلكترونية (تظهر فقط عند اختيار تحويل كاش) -->
-            <div id="onlinePaymentOptions" class="order-type-container" style="display: none; margin-top: 5px;">
-                <button type="button" class="order-type-btn active" id="vfcashBtn" onclick="setTransferMethod('vfcash')">
-                    📱 فودافون كاش
-                </button>
-                <button type="button" class="order-type-btn" id="instapayBtn" onclick="setTransferMethod('instapay')">
-                    ⚡ إنستاباي
-                </button>
-            </div>
-
-            <!-- صندوق عرض الرقم وزر النسخ (يظهر فقط عند اختيار تحويل كاش) -->
+            <!-- صندوق عرض الرقم وزر النسخ (يختفي في نقدي، ويظهر فقط عند اختيار فون كاش أو إنستا باي) -->
             <div id="paymentInfoBox" style="display: none; background: var(--bg); border: 1.5px dashed var(--border-subtle); padding: 10px 14px; border-radius: 14px; margin-bottom: 15px; align-items: center; justify-content: space-between;">
                 <div>
-                    <span id="paymentMethodLabel" style="font-size: 0.8rem; font-weight: 700; color: var(--desc-text); display: block;">رقم التحويل (فودافون كاش):</span>
+                    <span id="paymentMethodLabel" style="font-size: 0.8rem; font-weight: 700; color: var(--desc-text); display: block;">رقم التحويل:</span>
                     <b id="paymentNumberDisplay" style="font-size: 1.02rem; color: var(--accent); letter-spacing: 0.5px;">01091669151</b>
                 </div>
                 <button type="button" onclick="copyPaymentNumber()" id="copyBtn" style="background: var(--accent-light); border: 1.5px solid var(--accent); color: var(--accent); padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
@@ -466,9 +459,7 @@
         let currentTotal = 0; 
         let deferredPrompt;
         let selectedOrderType = 'delivery';
-        
-        let mainPaymentType = 'cash'; // 'cash' (نقدي) أو 'transfer' (تحويل كاش)
-        let selectedTransferMethod = 'vfcash'; // 'vfcash' أو 'instapay'
+        let selectedPaymentMethod = 'cash'; // 'cash', 'vfcash', 'instapay'
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -740,53 +731,41 @@
             }
         }
 
-        // دالة التبديل بين (نقدي) و (تحويل كاش)
-        function setMainPaymentType(type) {
-            mainPaymentType = type;
+        // دالة التبديل بين الخيارات الثلاثة المباشرة (نقدي / فون كاش / إنستا باي)
+        function setPaymentMethod(method) {
+            selectedPaymentMethod = method;
             const payCashBtn = document.getElementById('payCashBtn');
-            const payTransferBtn = document.getElementById('payTransferBtn');
-            const onlineOptions = document.getElementById('onlinePaymentOptions');
+            const payVfBtn = document.getElementById('payVfBtn');
+            const payInstaBtn = document.getElementById('payInstaBtn');
+            
             const infoBox = document.getElementById('paymentInfoBox');
-
-            if (type === 'cash') {
-                payCashBtn.classList.add('active');
-                payTransferBtn.classList.remove('active');
-                onlineOptions.style.display = 'none';
-                infoBox.style.display = 'none';
-            } else {
-                payTransferBtn.classList.add('active');
-                payCashBtn.classList.remove('active');
-                onlineOptions.style.display = 'flex';
-                infoBox.style.display = 'flex';
-                setTransferMethod(selectedTransferMethod);
-            }
-        }
-
-        // دالة التبديل بين المحافظ (فودافون كاش / إنستاباي)
-        function setTransferMethod(method) {
-            selectedTransferMethod = method;
-            const vfcashBtn = document.getElementById('vfcashBtn');
-            const instapayBtn = document.getElementById('instapayBtn');
             const paymentLabel = document.getElementById('paymentMethodLabel');
             const paymentNum = document.getElementById('paymentNumberDisplay');
             const copyBtn = document.getElementById('copyBtn');
             copyBtn.innerText = '📋 نسخ';
 
-            if (method === 'vfcash') {
-                vfcashBtn.classList.add('active');
-                instapayBtn.classList.remove('active');
-                paymentLabel.innerText = 'رقم التحويل (فودافون كاش):';
+            payCashBtn.classList.remove('active');
+            payVfBtn.classList.remove('active');
+            payInstaBtn.classList.remove('active');
+
+            if (method === 'cash') {
+                payCashBtn.classList.add('active');
+                infoBox.style.display = 'none';
+            } else if (method === 'vfcash') {
+                payVfBtn.classList.add('active');
+                infoBox.style.display = 'flex';
+                paymentLabel.innerText = 'رقم التحويل (فون كاش):';
                 paymentNum.innerText = VF_CASH_NUM;
-            } else {
-                instapayBtn.classList.add('active');
-                vfcashBtn.classList.remove('active');
-                paymentLabel.innerText = 'رقم التحويل (إنستاباي):';
+            } else if (method === 'instapay') {
+                payInstaBtn.classList.add('active');
+                infoBox.style.display = 'flex';
+                paymentLabel.innerText = 'رقم التحويل (إنستا باي):';
                 paymentNum.innerText = INSTAPAY_NUM;
             }
         }
 
         function copyPaymentNumber() {
-            const num = selectedTransferMethod === 'vfcash' ? VF_CASH_NUM : INSTAPAY_NUM;
+            const num = selectedPaymentMethod === 'vfcash' ? VF_CASH_NUM : INSTAPAY_NUM;
             const copyBtn = document.getElementById('copyBtn');
 
             if (navigator.clipboard && window.isSecureContext) {
@@ -831,10 +810,10 @@
             if (selectedOrderType === 'pickup') typeLabel = '🛍️ استلام من المطعم';
 
             let payLabel = '💵 نقدي (عند الاستلام)';
-            if (mainPaymentType === 'transfer') {
-                payLabel = selectedTransferMethod === 'vfcash' 
-                    ? `📱 فودافون كاش (${VF_CASH_NUM})` 
-                    : `⚡ إنستاباي (${INSTAPAY_NUM})`;
+            if (selectedPaymentMethod === 'vfcash') {
+                payLabel = `📱 فون كاش (${VF_CASH_NUM})`;
+            } else if (selectedPaymentMethod === 'instapay') {
+                payLabel = `⚡ إنستا باي (${INSTAPAY_NUM})`;
             }
             
             let msg = `✨ *طلب جديد من مطعم Dr. Broast* ✨\n\n`;
