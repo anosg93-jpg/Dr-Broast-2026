@@ -540,6 +540,10 @@
             const hasAddonOption = isBurgerOrChickenCategory(cat);
 
             document.getElementById('menuList').innerHTML = menuData.filter(i => i.category === cat).map(item => {
+                // استثناء صنف ساندوتش استربس من خيار إضافة قطعة برجر
+                const isExcludedItem = item.name.includes('استربس') || item.name.includes('إستربس') || item.name.includes('ستربس');
+                const showAddon = hasAddonOption && !isExcludedItem;
+
                 return `
                 <div class="food-card" data-category="${item.category}" data-base-price="${item.price}" data-price="${item.price}" data-has-addon="false">
                     <div class="item-img-box"><img src="${item.img}" onerror="this.src='${IMAGES_PATH}default.jpg'"></div>
@@ -550,7 +554,7 @@
                         </div>
                         ${item.desc ? `<p class="food-desc">${item.desc}</p>` : ''}
                         
-                        ${hasAddonOption ? `
+                        ${showAddon ? `
                         <div class="addon-box" onclick="toggleAddonBox(this)">
                             <div class="addon-content">
                                 <div class="addon-custom-check">✓</div>
