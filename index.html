@@ -227,6 +227,46 @@
             border-radius: 8px;
         }
 
+        /* تنسيق أزرار صوصات الريزو المبتكر والمضغوط */
+        .sauce-section {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 6px 0;
+            background: rgba(249, 94, 7, 0.05);
+            padding: 5px 8px;
+            border-radius: 12px;
+            border: 1px dashed var(--border-subtle);
+        }
+        .sauce-title {
+            font-size: 0.73rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-left: 2px;
+            white-space: nowrap;
+        }
+        .sauce-btn {
+            background: var(--white);
+            border: 1px solid var(--border-subtle);
+            color: var(--main-text);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .sauce-btn:hover {
+            border-color: var(--accent);
+        }
+        .sauce-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 2px 6px var(--accent-glow);
+        }
+
         .order-btn { background: var(--accent); color: white; border: none; padding: 7px 22px; border-radius: 16px; font-size: 0.88rem; font-weight: 800; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px var(--accent-glow); }
         .order-btn:active { transform: scale(0.96); }
         .order-btn.added { background: var(--success-dark); color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
@@ -262,7 +302,7 @@
         .footer-phone-call { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: white !important; padding: 8px 18px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 0.9rem; box-shadow: 0 4px 12px var(--accent-glow); }
         
         /* أيقونات السوشيال ميديا الحقيقية */
-        .social-icons-box { display: flex; justify-content: center; gap: 18px; margin: 22px 0; }
+        .social-icons-box { display: flex; justify-content: center; gap: 18px; margin: 22px 0 14px 0; }
         .social-btn-link { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-decoration: none; }
         .social-btn-link:hover { transform: translateY(-3px) scale(1.08); }
         .social-btn-link.fb-color { background: #1877F2; }
@@ -270,6 +310,30 @@
         .social-btn-link.wa-color { background: #25D366; }
         .social-btn-link svg { width: 24px; height: 24px; fill: white; }
         
+        /* زر موقعنا على الخريطة */
+        .location-btn-wrapper { margin-bottom: 20px; }
+        .location-map-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent-light);
+            color: var(--accent) !important;
+            border: 1.5px solid var(--accent);
+            padding: 7px 20px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.88rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(249, 94, 7, 0.1);
+        }
+        .location-map-btn:hover {
+            background: var(--accent);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--accent-glow);
+        }
+
         .footer-rights { font-size: 0.8rem; color: var(--main-text); font-weight: 700; margin-bottom: 5px; }
         .dev-credit { font-size: 0.85rem; color: var(--desc-text); font-weight: 700; }
         .dev-credit a { color: var(--accent); text-decoration: none; display: block; margin-top: 3px; }
@@ -381,9 +445,17 @@
             </a>
         </div>
 
+        <!-- زر موقعنا على الخريطة -->
+        <div class="location-btn-wrapper">
+            <a href="https://maps.app.goo.gl/egANaR8eiNm4Wxt46" target="_blank" class="location-map-btn">
+                📍 موقعنا على الخريطة
+            </a>
+        </div>
+
         <p class="footer-rights">جميع الحقوق محفوظة لـ مطعم Dr. Broast 2026 ©</p>
         <div class="dev-credit">
-          
+            Designed by eng / Anas Gaber shehata
+            <a href="tel:01003800314">📞 01003800314</a>
         </div>
     </footer>
 
@@ -458,7 +530,7 @@
         let currentTotal = 0; 
         let deferredPrompt;
         let selectedOrderType = 'delivery';
-        let selectedPaymentMethod = 'cash'; // 'cash', 'vfcash', 'instapay'
+        let selectedPaymentMethod = 'cash';
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -509,6 +581,12 @@
             if (!category) return false;
             const cat = category.trim();
             return cat.includes('فراخ') || cat.includes('برجر');
+        }
+
+        function isRizoCategory(category, name) {
+            const c = (category || '').trim();
+            const n = (name || '').trim();
+            return c.includes('ريزو') || n.includes('ريزو');
         }
 
         async function loadMenu() {
@@ -573,9 +651,10 @@
             document.getElementById('menuList').innerHTML = menuData.filter(i => i.category === cat).map(item => {
                 const isExcludedItem = item.name.includes('استربس') || item.name.includes('إستربس') || item.name.includes('ستربس');
                 const showAddon = hasAddonOption && !isExcludedItem;
+                const isRizo = isRizoCategory(item.category, item.name);
 
                 return `
-                <div class="food-card" data-category="${item.category}" data-base-price="${item.price}" data-price="${item.price}" data-has-addon="false">
+                <div class="food-card" data-category="${item.category}" data-base-price="${item.price}" data-price="${item.price}" data-has-addon="false" data-selected-sauce="">
                     <div class="item-img-box"><img src="${item.img}" onerror="this.src='${IMAGES_PATH}default.jpg'"></div>
                     <div class="food-info">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
@@ -594,12 +673,31 @@
                         </div>
                         ` : ''}
 
+                        ${isRizo ? `
+                        <div class="sauce-section">
+                            <span class="sauce-title">🥣 الصوص:</span>
+                            <button type="button" class="sauce-btn" onclick="selectSauce(this, 'رانش')">رانش</button>
+                            <button type="button" class="sauce-btn" onclick="selectSauce(this, 'باربيكيو')">باربيكيو</button>
+                            <button type="button" class="sauce-btn" onclick="selectSauce(this, 'سويت شيلي')">سويت شيلي</button>
+                            <button type="button" class="sauce-btn" onclick="selectSauce(this, 'تيكساس')">تيكساس</button>
+                            <button type="button" class="sauce-btn" onclick="selectSauce(this, 'سموكي فاير')">سموكي فاير</button>
+                        </div>
+                        ` : ''}
+
                         <div style="display: flex; justify-content: flex-end; width: 100%; margin-top: auto; padding-top: 6px;">
                             <button class="order-btn" onclick="addToCart(event, this, '${item.name}', '${item.img}')">اطلب</button>
                         </div>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function selectSauce(btn, sauceName) {
+            const container = btn.parentElement;
+            container.querySelectorAll('.sauce-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const card = btn.closest('.food-card');
+            card.dataset.selectedSauce = sauceName;
         }
 
         function toggleAddonBox(box) {
@@ -621,7 +719,19 @@
             const category = card.dataset.category || '';
             const hasAddon = card.dataset.hasAddon === "true";
 
+            const isRizo = isRizoCategory(category, name);
+            if (isRizo) {
+                const selectedSauce = card.dataset.selectedSauce;
+                if (!selectedSauce) {
+                    alert("اختار الصوص أولاً");
+                    return;
+                }
+            }
+
             let finalName = name;
+            if (isRizo && card.dataset.selectedSauce) {
+                finalName += ` (صوص ${card.dataset.selectedSauce})`;
+            }
             if (hasAddon) {
                 finalName += ' (مع إضافة قطعة برجر)';
             }
@@ -730,7 +840,6 @@
             }
         }
 
-        // دالة التبديل بين الخيارات الثلاثة (نقدي / محفظة إلكترونية / إنستا باي)
         function setPaymentMethod(method) {
             selectedPaymentMethod = method;
             const payCashBtn = document.getElementById('payCashBtn');
