@@ -109,9 +109,9 @@
         .header-logo { width: 100%; height: 100%; border-radius: 22px; object-fit: cover; }
         .theme-toggle { position: absolute; right: 10px; top: 0; width: 44px; height: 44px; background: var(--bg); border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; border: none; color: var(--main-text); }
         .cart-trigger-container { position: absolute; left: 10px; top: 0; }
-        .cart-trigger { width: 44px; height: 44px; background: var(--bg); border-radius: 14px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .cart-trigger.shake { animation: cartShake 0.5s ease-in-out; }
-        @keyframes cartShake { 0%, 100% { transform: scale(1) rotate(0deg); } 20%, 60% { transform: scale(1.15) rotate(-10deg); } 40%, 80% { transform: scale(1.15) rotate(10deg); } }
+        .cart-trigger { width: 44px; height: 44px; background: var(--bg); border-radius: 14px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: transform 0.2s ease; }
+        .cart-trigger.shake { animation: cartShake 0.4s ease-in-out; }
+        @keyframes cartShake { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.08) rotate(5deg); } }
         .badge { position: absolute; top: -5px; right: -5px; background: var(--accent); color: #ffffff; font-size: 10px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; transform: scale(0); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .badge.show { transform: scale(1); }
         
@@ -227,7 +227,7 @@
             border-radius: 8px;
         }
 
-        /* تنسيق أزرار صوصات الريزو المبتكر والمضغوط */
+        /* تنسيق أزرار الخيارات الصوص والنوع */
         .sauce-section {
             display: flex;
             align-items: center;
@@ -250,7 +250,9 @@
             background: var(--white);
             border: 1px solid var(--border-subtle);
             color: var(--main-text);
-            padding: 3px 8px;
+            padding: 3px 10px;
+            min-width: 48px;
+            text-align: center;
             border-radius: 8px;
             font-size: 0.72rem;
             font-weight: 800;
@@ -267,10 +269,58 @@
             box-shadow: 0 2px 6px var(--accent-glow);
         }
 
-        .order-btn { background: var(--accent); color: white; border: none; padding: 7px 22px; border-radius: 16px; font-size: 0.88rem; font-weight: 800; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px var(--accent-glow); }
+        /* شريط أزرار التحكم بالكمية وزر اطلب */
+        .action-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            width: 100%;
+            margin-top: auto;
+            padding-top: 6px;
+        }
+
+        .qty-picker {
+            display: inline-flex;
+            align-items: center;
+            background: var(--bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2px 4px;
+            gap: 4px;
+        }
+        .qty-btn {
+            background: var(--white);
+            border: 1px solid var(--border-subtle);
+            color: var(--accent);
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .qty-btn:active {
+            transform: scale(0.9);
+            background: var(--accent-light);
+        }
+        .qty-val {
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: var(--main-text);
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .order-btn { background: var(--accent); color: white; border: none; padding: 7px 20px; border-radius: 16px; font-size: 0.88rem; font-weight: 800; cursor: pointer; transition: transform 0.15s ease, background-color 0.3s ease; box-shadow: 0 4px 12px var(--accent-glow); }
         .order-btn:active { transform: scale(0.96); }
         .order-btn.added { background: var(--success-dark); color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
-        .fly-item { position: fixed; z-index: 9999; pointer-events: none; width: 32px; height: 32px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1); }
+        .fly-item { position: fixed; z-index: 9999; pointer-events: none; width: 26px; height: 26px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); }
 
         /* --- شريط التثبيت الذكي --- */
         #install-bar {
@@ -321,7 +371,8 @@
         .cart-item-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
         .cart-item-info { flex: 1; }
         .cart-item-name { font-weight: 800; font-size: 0.9rem; color: var(--main-text); }
-        .cart-item-price { color: var(--accent); font-weight: 900; font-size: 0.88rem; display: block; }
+        .cart-item-qty-badge { display: inline-block; background: var(--accent-light); color: var(--accent); font-weight: 800; font-size: 0.8rem; padding: 2px 8px; border-radius: 8px; margin-top: 3px; border: 1px solid var(--border-subtle); }
+        .cart-item-price { color: var(--accent); font-weight: 900; font-size: 0.88rem; display: block; margin-top: 2px; }
         .remove-btn { color: #ff3b30; font-weight: 800; font-size: 0.75rem; cursor: pointer; padding: 4px 8px; }
 
         .order-type-container { display: flex; background: var(--bg); padding: 6px; border-radius: 16px; margin: 10px 0; gap: 6px; border: 1px solid var(--border-subtle); }
@@ -558,6 +609,11 @@
             return c.includes('ريزو') || n.includes('ريزو');
         }
 
+        function isBroastOrStripsCategory(category) {
+            const c = (category || '').trim();
+            return c.includes('بروست') || c.includes('استربس') || c.includes('ستربس');
+        }
+
         async function loadMenu() {
             startCreativeCounter();
 
@@ -621,9 +677,10 @@
                 const isExcludedItem = item.name.includes('استربس') || item.name.includes('إستربس') || item.name.includes('ستربس');
                 const showAddon = hasAddonOption && !isExcludedItem;
                 const isRizo = isRizoCategory(item.category, item.name);
+                const isBroastOrStrips = isBroastOrStripsCategory(item.category);
 
                 return `
-                <div class="food-card" data-category="${item.category}" data-base-price="${item.price}" data-price="${item.price}" data-has-addon="false" data-selected-sauce="">
+                <div class="food-card" data-category="${item.category}" data-base-price="${item.price}" data-price="${item.price}" data-qty="1" data-has-addon="false" data-selected-sauce="" data-selected-flavor="">
                     <div class="item-img-box"><img src="${item.img}" onerror="this.src='${IMAGES_PATH}default.jpg'"></div>
                     <div class="food-info">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
@@ -653,12 +710,36 @@
                         </div>
                         ` : ''}
 
-                        <div style="display: flex; justify-content: flex-end; width: 100%; margin-top: auto; padding-top: 6px;">
+                        ${isBroastOrStrips ? `
+                        <div class="sauce-section">
+                            <span class="sauce-title">🌶️ النوع:</span>
+                            <button type="button" class="sauce-btn" onclick="selectFlavor(this, 'عادي')">عادي</button>
+                            <button type="button" class="sauce-btn" onclick="selectFlavor(this, 'حار')">حار</button>
+                        </div>
+                        ` : ''}
+
+                        <div class="action-row">
+                            <div class="qty-picker">
+                                <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
+                                <span class="qty-val">1</span>
+                                <button type="button" class="qty-btn" onclick="changeQty(this, -1)">-</button>
+                            </div>
                             <button class="order-btn" onclick="addToCart(event, this, '${item.name}', '${item.img}')">اطلب</button>
                         </div>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function changeQty(btn, delta) {
+            const card = btn.closest('.food-card');
+            let currentQty = parseInt(card.dataset.qty || 1);
+            currentQty += delta;
+            if (currentQty < 1) currentQty = 1;
+            
+            card.dataset.qty = currentQty;
+            const qtyValEl = card.querySelector('.qty-val');
+            if (qtyValEl) qtyValEl.innerText = currentQty;
         }
 
         function selectSauce(btn, sauceName) {
@@ -667,6 +748,14 @@
             btn.classList.add('active');
             const card = btn.closest('.food-card');
             card.dataset.selectedSauce = sauceName;
+        }
+
+        function selectFlavor(btn, flavorName) {
+            const container = btn.parentElement;
+            container.querySelectorAll('.sauce-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const card = btn.closest('.food-card');
+            card.dataset.selectedFlavor = flavorName;
         }
 
         function toggleAddonBox(box) {
@@ -685,6 +774,7 @@
         function addToCart(e, btn, name, img) {
             const card = btn.closest('.food-card');
             const price = parseFloat(card.dataset.price);
+            const qty = parseInt(card.dataset.qty || 1);
             const category = card.dataset.category || '';
             const hasAddon = card.dataset.hasAddon === "true";
 
@@ -697,20 +787,39 @@
                 }
             }
 
+            const isBroastOrStrips = isBroastOrStripsCategory(category);
+            if (isBroastOrStrips) {
+                const selectedFlavor = card.dataset.selectedFlavor;
+                if (!selectedFlavor) {
+                    alert("اختار النوع أولاً");
+                    return;
+                }
+            }
+
             let finalName = name;
             if (isRizo && card.dataset.selectedSauce) {
                 finalName += ` (صوص ${card.dataset.selectedSauce})`;
+            }
+            if (isBroastOrStrips && card.dataset.selectedFlavor) {
+                finalName += ` (${card.dataset.selectedFlavor})`;
             }
             if (hasAddon) {
                 finalName += ' (مع إضافة قطعة برجر)';
             }
 
-            cart.push({
-                name: finalName, 
-                price: price, 
-                img: img, 
-                category: category
-            });
+            // البحث عن الصنف إذا كان موجوداً مسبقاً بنفس الاسم والتفاصيل للتجميع
+            const existingIndex = cart.findIndex(item => item.name === finalName);
+            if (existingIndex > -1) {
+                cart[existingIndex].qty += qty;
+            } else {
+                cart.push({
+                    name: finalName, 
+                    price: price, 
+                    qty: qty,
+                    img: img, 
+                    category: category
+                });
+            }
 
             btn.innerText = 'تم الطلب ✓'; 
             btn.classList.add('added');
@@ -727,9 +836,9 @@
             const cartPos = cartBtn.getBoundingClientRect();
 
             setTimeout(() => { 
-                fly.style.left = (cartPos.left + 20) + 'px'; 
-                fly.style.top = (cartPos.top + 20) + 'px'; 
-                fly.style.transform = 'scale(0.2)'; 
+                fly.style.left = (cartPos.left + 15) + 'px'; 
+                fly.style.top = (cartPos.top + 15) + 'px'; 
+                fly.style.transform = 'scale(0.1)'; 
                 fly.style.opacity = '0'; 
             }, 10);
 
@@ -737,24 +846,27 @@
                 fly.remove(); 
                 updateCart(); 
                 cartBtn.classList.add('shake'); 
-                setTimeout(() => cartBtn.classList.remove('shake'), 500); 
-            }, 700);
+                setTimeout(() => cartBtn.classList.remove('shake'), 400); 
+            }, 600);
         }
 
         function updateCart() {
             const badge = document.getElementById('cartBadge'); 
-            badge.innerText = cart.length; 
-            badge.classList.toggle('show', cart.length > 0); 
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            badge.innerText = totalCount; 
+            badge.classList.toggle('show', totalCount > 0); 
             currentTotal = 0;
 
             document.getElementById('cartItemsList').innerHTML = cart.map((item, idx) => {
-                currentTotal += parseFloat(item.price);
+                const itemTotalPrice = parseFloat(item.price) * item.qty;
+                currentTotal += itemTotalPrice;
                 return `
                 <div class="cart-item-card">
                     <img src="${item.img}" class="cart-item-img" onerror="this.src='${IMAGES_PATH}default.jpg'">
                     <div class="cart-item-info">
                         <span class="cart-item-name">${item.name}</span>
-                        <span class="cart-item-price">${item.price} ج.م</span>
+                        <div class="cart-item-qty-badge">العدد: ${item.qty}</div>
+                        <span class="cart-item-price">${itemTotalPrice} ج.م</span>
                     </div>
                     <span class="remove-btn" onclick="removeFromCart(${idx})">حذف</span>
                 </div>`;
@@ -905,7 +1017,7 @@
             
             msg += `\n🛒 *تفاصيل الطلب:* \n`;
             msg += `---------------------------------\n`;
-            msg += cart.map((i, index) => `${index + 1}. ${i.name} [${i.category}] - (${i.price} ج.م)`).join('\n') + `\n`;
+            msg += cart.map((i, index) => `${index + 1}. ${i.name} [العدد: ${i.qty}] - (${i.price * i.qty} ج.م)`).join('\n') + `\n`;
             msg += `---------------------------------\n\n`;
             
             msg += `💰 *الإجمالي الكلي:* *${currentTotal} ج.م*\n\n`;
