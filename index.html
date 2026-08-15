@@ -611,7 +611,7 @@
 
         function isBroastOrStripsCategory(category) {
             const c = (category || '').trim();
-            return c.includes('بروست') || c.includes('استربس') || c.includes('ستربس');
+            return c.includes('بروست') || c.includes('استربس') || c.includes('ستربس') || c.includes('الفرخه الكامله') || c.includes('الفرخة الكاملة') || c.includes('فرخة كاملة') || c.includes('فرخه كامله');
         }
 
         async function loadMenu() {
