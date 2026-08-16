@@ -360,9 +360,7 @@
         .social-btn-link.wa-color { background: #25D366; }
         .social-btn-link svg { width: 24px; height: 24px; fill: white; }
 
-        .footer-rights { font-size: 0.8rem; color: var(--main-text); font-weight: 700; margin-bottom: 5px; }
-        .dev-credit { font-size: 0.85rem; color: var(--desc-text); font-weight: 700; }
-        .dev-credit a { color: var(--accent); text-decoration: none; display: block; margin-top: 3px; }
+        .footer-rights { font-size: 0.8rem; color: var(--main-text); font-weight: 700; margin-bottom: 0; }
 
         /* مودال السلة */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 2000; display: none; justify-content: center; align-items: flex-end; }
@@ -473,10 +471,6 @@
         </div>
 
         <p class="footer-rights">جميع الحقوق محفوظة لـ مطعم Dr. Broast 2026 ©</p>
-        <div class="dev-credit">
-            Designed by eng / Anas Gaber shehata
-            <a href="tel:01003800314">📞 01003800314</a>
-        </div>
     </footer>
 
     <!-- نافذة السلة -->
@@ -832,7 +826,6 @@
                 finalName += ` (مع ${addonLabel})`;
             }
 
-            // البحث عن الصنف إذا كان موجوداً مسبقاً بنفس الاسم والتفاصيل للتجميع
             const existingIndex = cart.findIndex(item => item.name === finalName);
             if (existingIndex > -1) {
                 cart[existingIndex].qty += qty;
