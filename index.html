@@ -165,7 +165,7 @@
         .food-desc { font-size: 0.8rem; color: var(--desc-text); line-height: 1.4; margin-top: 4px; margin-bottom: 6px; }
         .food-price { font-weight: 900; color: var(--accent); font-size: 1.05rem; white-space: nowrap; }
         
-        /* الصندوق الإبداعي لإضافة قطعة برجر */
+        /* الصندوق الإبداعي للإضافة */
         .addon-box {
             background: var(--bg);
             border: 1.5px solid var(--border-subtle);
@@ -597,10 +597,16 @@
             }, intervalTime);
         }
 
-        function isBurgerOrChickenCategory(category) {
+        function isChickenBurgerCategory(category) {
             if (!category) return false;
             const cat = category.trim();
-            return cat.includes('فراخ') || cat.includes('برجر');
+            return cat.includes('برجر فراخ') || cat.includes('برجر الدجاج') || cat.includes('برجر الفراخ');
+        }
+
+        function isBeefBurgerCategory(category) {
+            if (!category) return false;
+            const cat = category.trim();
+            return cat.includes('برجر لحم') || cat.includes('برجر اللحم') || (cat.includes('برجر') && !isChickenBurgerCategory(category));
         }
 
         function isRizoCategory(category, name) {
@@ -671,16 +677,34 @@
         function filterCat(cat, el) {
             if(el) { document.querySelectorAll('.cat-item').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
             
-            const hasAddonOption = isBurgerOrChickenCategory(cat);
+            const isChickenBurger = isChickenBurgerCategory(cat);
+            const isBeefBurger = isBeefBurgerCategory(cat);
 
-            document.getElementById('menuList').innerHTML = menuData.filter(i => i.category === cat).map(item => {
-                const isExcludedItem = item.name.includes('استربس') || item.name.includes('إستربس') || item.name.includes('ستربس');
-                const showAddon = hasAddonOption && !isExcludedItem;
+            const categoryItems = menuData.filter(i => i.category === cat);
+
+            document.getElementById('menuList').innerHTML = categoryItems.map((item, index) => {
                 const isRizo = isRizoCategory(item.category, item.name);
                 const isBroastOrStrips = isBroastOrStripsCategory(item.category);
 
+                let showAddon = false;
+                let addonLabel = 'إضافة قطعة برجر';
+
+                if (isBeefBurger) {
+                    showAddon = true;
+                    addonLabel = 'إضافة قطعة برجر';
+                } else if (isChickenBurger) {
+                    showAddon = true;
+                    if (index === 0) {
+                        addonLabel = 'إضافة قطعة استربس';
+                    } else if (index === 1) {
+                        addonLabel = 'إضافة قطعة برجر';
+                    } else {
+                        addonLabel = 'إضافة قطعة بانيه';
+                    }
+                }
+
                 return `
-                <div class="food-card" data-category="${item.category}" data-base-price="${item.price}" data-price="${item.price}" data-qty="1" data-has-addon="false" data-selected-sauce="" data-selected-flavor="">
+                <div class="food-card" data-category="${item.category}" data-base-price="${item.price}" data-price="${item.price}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
                     <div class="item-img-box"><img src="${item.img}" onerror="this.src='${IMAGES_PATH}default.jpg'"></div>
                     <div class="food-info">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
@@ -693,7 +717,7 @@
                         <div class="addon-box" onclick="toggleAddonBox(this)">
                             <div class="addon-content">
                                 <div class="addon-custom-check">✓</div>
-                                <span class="addon-label-text">إضافة قطعة برجر</span>
+                                <span class="addon-label-text">${addonLabel}</span>
                             </div>
                             <span class="addon-price-badge">+60 ج.م</span>
                         </div>
@@ -777,6 +801,7 @@
             const qty = parseInt(card.dataset.qty || 1);
             const category = card.dataset.category || '';
             const hasAddon = card.dataset.hasAddon === "true";
+            const addonLabel = card.dataset.addonLabel || 'إضافة قطعة برجر';
 
             const isRizo = isRizoCategory(category, name);
             if (isRizo) {
@@ -804,7 +829,7 @@
                 finalName += ` (${card.dataset.selectedFlavor})`;
             }
             if (hasAddon) {
-                finalName += ' (مع إضافة قطعة برجر)';
+                finalName += ` (مع ${addonLabel})`;
             }
 
             // البحث عن الصنف إذا كان موجوداً مسبقاً بنفس الاسم والتفاصيل للتجميع
