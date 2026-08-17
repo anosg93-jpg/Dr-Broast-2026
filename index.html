@@ -439,6 +439,36 @@
         </div>
     </div>
 
+    <!-- تسجيل Service Worker لدعم الإشعارات في الخلفية -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    self.addEventListener('install', (e) => { self.skipWaiting(); });
+                    self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
+                    self.addEventListener('push', (e) => {
+                        const data = e.data ? e.data.json() : { title: "أوردر جديد - Dr. Broast", body: "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!" };
+                        e.waitUntil(
+                            self.registration.showNotification(data.title, {
+                                body: data.body,
+                                icon: "images/logotempo.png",
+                                badge: "images/logotempo.png",
+                                vibrate: [200, 100, 200],
+                                tag: "new-order",
+                                renotify: true
+                            })
+                        );
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'text/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl)
+                    .then(reg => console.log('Service Worker registered successfully'))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+    </script>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -502,7 +532,7 @@
             if (!isInitialLoad && data) {
                 if (window.isDeviceOwner && window.isDeviceOwner()) {
                     window.playBellNotification();
-                    // إشعار النظام المكتوب بالتنسيق المطلوب بالضبط
+                    // إشعار النظام المكتوب بالتنسيق المطلق تماماً
                     window.showPushNotification("أوردر جديد - Dr. Broast 🍗", "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!");
                 }
             }
