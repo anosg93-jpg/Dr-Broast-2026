@@ -41,7 +41,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
         body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 70px; }
 
-        /* شارة صاحب المطعم الفاخرة في أعلى التطبيق */
+        /* شارة صاحب المطعم */
         .owner-badge-bar {
             background: linear-gradient(90deg, #d85000, #ff9800);
             color: #ffffff;
@@ -206,9 +206,7 @@
         .user-fields input:focus { border-color: var(--accent); }
         .submit-btn { background: var(--accent); color: white; border: none; padding: 17px; border-radius: 18px; width: 100%; font-weight: 900; cursor: pointer; font-size: 1rem; box-shadow: 0 6px 18px var(--accent-glow); }
 
-        /* ========================================================
-           --- تصميم واجهة الإدارة والتحكم والدخول ---
-           ======================================================== */
+        /* --- مودال واجهة الإدارة --- */
         .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 16px; backdrop-filter: blur(4px); }
         .admin-card { background: #f3f4f8; width: 100%; max-width: 440px; border-radius: 28px; padding: 22px 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 1px solid #ffffff; }
         
@@ -237,14 +235,12 @@
         input:checked + .slider { background-color: #12a150; }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* نموذج الإدخال والتسجيل بشكل كريتيف واحترافي */
         .login-card-box, .pass-card-box { background: white; padding: 22px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
         .login-card-box label, .pass-card-box label { display: block; font-size: 0.85rem; font-weight: 800; color: #344054; margin-bottom: 6px; }
         .login-card-box input, .pass-card-box input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1.5px solid #d0d5dd; margin-bottom: 14px; font-weight: 700; outline: none; transition: border-color 0.2s; }
         .login-card-box input:focus, .pass-card-box input:focus { border-color: #d85000; }
         .login-btn, .pass-save-btn { width: 100%; background: linear-gradient(90deg, #d85000, #f95e07); color: white; border: none; padding: 13px; border-radius: 14px; font-weight: 900; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 12px rgba(216, 80, 0, 0.25); }
 
-        /* سجل الطلبات المنسق */
         .order-log-card { background: white; padding: 16px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #eaecf0; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .order-log-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eaecf0; padding-bottom: 8px; margin-bottom: 10px; }
         .order-log-name { font-weight: 900; font-size: 0.95rem; color: #1d2939; }
@@ -257,9 +253,9 @@
 </head>
 <body>
 
-    <!-- شارة صاحب المطعم الفاخرة التي تظهر تلقائياً عندما يكون وضع الإدارة نشطاً -->
+    <!-- شارة صاحب المطعم -->
     <div id="ownerBadgeBar" class="owner-badge-bar">
-        <span>👑 وضع صاحب المطعم نشط</span>
+        <span>👑 وضع صاحب المطعم نشط (الإشعارات مفعلة)</span>
     </div>
 
     <!-- شاشة البداية -->
@@ -375,9 +371,7 @@
         </div>
     </div>
 
-    <!-- ========================================================
-         --- مودال واجهة الإدارة والتحكم ودخول كلمة المرور ---
-         ======================================================== -->
+    <!-- مودال واجهة الإدارة والتحكم -->
     <div class="admin-modal" id="adminModal" onclick="if(event.target==this) closeAdminPanel()">
         <div class="admin-card">
             <div class="admin-header">
@@ -385,19 +379,17 @@
                 <button class="admin-close-btn" onclick="closeAdminPanel()">✕</button>
             </div>
 
-            <!-- كارت أداء إدخال كلمة السر في حالة طلبها -->
             <div id="adminLoginBox" class="login-card-box" style="display: none;">
                 <div style="text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 2.5rem; margin-bottom: 5px;">🔐</div>
                     <h3 style="font-weight: 900; color: #1d2939; font-size: 1.1rem;">دخول لوحة التحكم</h3>
-                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتأكيد هويتك كـ صاحب المطعم</p>
+                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل الإشعارات وصلاحيات المطعم</p>
                 </div>
                 <label>كلمة المرور</label>
                 <input type="password" id="adminPassLoginInput" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyAdminLogin()">
-                <button class="login-btn" onclick="verifyAdminLogin()">تسجيل الدخول</button>
+                <button class="login-btn" onclick="verifyAdminLogin()">تسجيل الدخول وتفعيل الإشعارات</button>
             </div>
 
-            <!-- المحتوى الرئيسي للوحة الإدارة بعد الدخول -->
             <div id="adminMainContent" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
                 <div class="admin-tabs">
                     <button class="admin-tab-btn active" id="tabStatusBtn" onclick="switchAdminTab('status')">📦 حالة الأصناف</button>
@@ -405,7 +397,6 @@
                     <button class="admin-tab-btn" id="tabPassBtn" onclick="switchAdminTab('pass')">🔑 كلمة السر</button>
                 </div>
 
-                <!-- تبويب حالة الأصناف -->
                 <div id="tabStatusContent" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
                     <div class="admin-bulk-actions">
                         <button class="btn-bulk-enable" onclick="bulkSetStatus(true)">✅ تشغيل جميع الأصناف</button>
@@ -414,12 +405,10 @@
                     <div class="admin-scroll-area" id="adminItemsList"></div>
                 </div>
 
-                <!-- تبويب سجل الطلبات -->
                 <div id="tabOrdersContent" style="display: none; flex: 1; overflow: hidden;">
                     <div class="admin-scroll-area" id="adminOrdersList"></div>
                 </div>
 
-                <!-- تبويب كلمة السر -->
                 <div id="tabPassContent" style="display: none; flex: 1;">
                     <div class="pass-card-box">
                         <label>كلمة السر الحالية</label>
@@ -438,15 +427,13 @@
         </div>
     </div>
 
-    <!-- تسجيل Service Worker لدعم إشعارات النظام الحقيقية -->
+    <!-- تسجيل Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(reg => {
-                    console.log('ServiceWorker registered successfully:', reg.scope);
-                }).catch(err => {
-                    console.log('ServiceWorker registration failed:', err);
-                });
+                    console.log('SW Registered:', reg.scope);
+                }).catch(err => console.log('SW registration error:', err));
             });
         }
     </script>
@@ -513,9 +500,14 @@
             
             if (!isInitialLoad && data) {
                 if (window.isDeviceOwner && window.isDeviceOwner()) {
+                    // تشغيل الصوت التنبيهي المعتمد
                     window.playBellNotification();
-                    // إشعار النظام المكتوب بالتنسيق المطلوب بالضبط
-                    window.showPushNotification("أوردر جديد - Dr. Broast 🍗", "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!");
+
+                    // إرسال الإشعار الكتابي المطابق للصورة تماماً
+                    window.showPushNotification(
+                        "🍗 أوردر جديد - Dr. Broast", 
+                        "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!"
+                    );
                 }
             }
             isInitialLoad = false;
@@ -524,7 +516,7 @@
         });
     </script>
 
-    <!-- المنطق الرئيسي للتطبيق والإدارة -->
+    <!-- المنطق الرئيسي والتنبيهات -->
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQYAaXvqYs8Mg1uAiFsjL5l0WMx6ttAhWmbIakcuGzzGtzHw0DDGEBEOFSn0h3z8kaikRFJQ1Mt9wJo/pub?output=csv';
         const IMAGES_PATH = "./images/"; 
@@ -540,40 +532,46 @@
 
         let disabledItems = JSON.parse(localStorage.getItem('dr_disabled_items') || '[]');
 
-        /* --- تفعيل إشعارات المتصفح (Web Push Notifications) تلقائياً لصاحب المطعم --- */
-        function requestNotificationPermissionSilently() {
+        /* طلب إذن الإشعارات من النظام */
+        function enableNotificationPermission() {
             if ("Notification" in window && Notification.permission !== "granted") {
-                Notification.requestPermission();
+                Notification.requestPermission().then(permission => {
+                    console.log("Notification permission:", permission);
+                });
             }
         }
 
+        /* دالة إظهار الإشعار في شريط النظام / شاشة القفل */
         window.showPushNotification = function(title, body) {
-            if ("Notification" in window && Notification.permission === "granted") {
-                try {
-                    const options = {
-                        body: body,
-                        icon: "images/logotempo.png",
-                        badge: "images/logotempo.png",
-                        vibrate: [200, 100, 200],
-                        tag: "new-order",
-                        renotify: true
-                    };
-                    if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-                        navigator.serviceWorker.ready.then(registration => {
-                            registration.showNotification(title, options);
-                        });
-                    } else {
+            if (!("Notification" in window)) return;
+
+            if (Notification.permission === "granted") {
+                const options = {
+                    body: body,
+                    icon: "images/logotempo.png",
+                    badge: "images/logotempo.png",
+                    vibrate: [300, 150, 300, 150, 400],
+                    tag: "order-" + Date.now(),
+                    renotify: true,
+                    requireInteraction: true,
+                    data: { url: window.location.href }
+                };
+
+                if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+                    navigator.serviceWorker.ready.then(reg => {
+                        reg.showNotification(title, options);
+                    }).catch(() => {
                         new Notification(title, options);
-                    }
-                } catch(e) {
-                    console.log("Notification error:", e);
+                    });
+                } else {
+                    new Notification(title, options);
                 }
+            } else {
+                enableNotificationPermission();
             }
         };
 
-        /* ========================================================
-           --- التنبيه الصوتي (جرس قوي واضح لمدة ثانيتين) ---
-           ======================================================== */
+        /* التنبيه الصوتي (جرس التنبيه الحالي بدون أي تعديل) */
         function playBellSoundOnce(audioCtx) {
             const now = audioCtx.currentTime;
             [1046.5, 2093.0].forEach(freq => { 
@@ -599,13 +597,10 @@
                 playBellSoundOnce(ctx);
                 setTimeout(() => playBellSoundOnce(ctx), 1000);
             } catch (e) {
-                console.log("Audio alert playback error:", e);
+                console.log("Audio alert error:", e);
             }
         };
 
-        /* ========================================================
-           --- دوال التحقق من هوية صاحب المطعم وأمان الدخول ---
-           ======================================================== */
         window.isDeviceOwner = function() {
             const myToken = localStorage.getItem('dr_owner_token');
             return (myToken && window.serverToken && myToken === window.serverToken);
@@ -615,7 +610,7 @@
             const ownerBadgeBar = document.getElementById('ownerBadgeBar');
             if (window.isDeviceOwner()) {
                 ownerBadgeBar.style.display = 'flex';
-                requestNotificationPermissionSilently();
+                enableNotificationPermission();
             } else {
                 ownerBadgeBar.style.display = 'none';
             }
@@ -648,6 +643,8 @@
             const currentServerPass = window.serverPass || '1234';
 
             if (enteredPass === currentServerPass) {
+                enableNotificationPermission();
+
                 let currentToken = window.serverToken;
                 if (!currentToken) {
                     currentToken = "token_" + Date.now();
@@ -1121,9 +1118,7 @@
             window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
         }
 
-        /* ========================================================
-           --- التبويبات والتحكم بالواجهة ---
-           ======================================================== */
+        /* إدارة الأصناف والتبويبات */
         function switchAdminTab(tab) {
             document.getElementById('tabStatusBtn').classList.remove('active');
             document.getElementById('tabOrdersBtn').classList.remove('active');
