@@ -15,7 +15,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDKs v8 المعتمدة للعمل اللحظي في الخلفية -->
+    <!-- Firebase SDKs v8 المباشرة -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -291,7 +291,7 @@
             <div class="header-top">
                 <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
                 
-                <!-- الحاوية المدمجة للوجو والشارة فوقه مباشرة -->
+                <!-- الحاوية المركزية للوجو والشارة فوقه مباشرة -->
                 <div class="logo-center-wrapper">
                     <div id="ownerTopBadge" class="owner-badge-top" onclick="checkAndOpenAdmin()">
                         <span>👑 صاحب المطعم</span>
@@ -430,6 +430,9 @@
             </div>
 
             <div id="tabStatusContent" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+                <!-- زر اختبار الإشعار الفوري للتأكد على جهازك -->
+                <button onclick="testNotificationDirectly()" style="background: #1877F2; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-bottom: 10px;">🔔 اضغط هنا لاختبار الإشعار في هاتفك الآن</button>
+
                 <div class="admin-bulk-actions">
                     <button class="btn-bulk-enable" onclick="toggleAllItems(true)">✅ تشغيل جميع الأصناف</button>
                     <button class="btn-bulk-disable" onclick="toggleAllItems(false)">🛑 إيقاف جميع الأصناف</button>
@@ -456,7 +459,6 @@
     </div>
 
     <script>
-        // 1. تهيئة الفايربيز SDK v8 المباشرة
         const firebaseConfig = {
             apiKey: "AIzaSyDgTJ7Q8Vyi1Cd3ER0wT4qOaet5Wd_D8o8",
             authDomain: "drbroast.firebaseapp.com",
@@ -474,17 +476,10 @@
         let disabledItems = {};
         let isFirstOrdersLoad = true;
 
-        // تسجيل Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW reg failed: ', err));
         }
 
-        // طلب صلاحيات الإشعارات للنظام
-        if ("Notification" in window && Notification.permission !== "granted") {
-            Notification.requestPermission();
-        }
-
-        // جلب كلمة السر وحالة الأصناف المعطلة لحظياً
         db.ref('admin/password').on('value', snap => {
             if(snap.exists()) adminPassword = snap.val();
         });
@@ -494,7 +489,7 @@
             if (menuData.length > 0) renderNav();
         });
 
-        // الاستماع للأوردرات الجديدة وإطلاق الإنذار والإشعار فوراً لصاحب المطعم
+        // استماع فوري للطلبات الجديدة
         db.ref('orders').limitToLast(1).on('child_added', snap => {
             if (isFirstOrdersLoad) {
                 isFirstOrdersLoad = false;
@@ -519,7 +514,7 @@
         let selectedPaymentMethod = 'cash';
         let currentActiveCategory = "";
 
-        // --- نظام التنبيه والإشعارات المعتمد من التطبيق الشغال ---
+        // دالة إرسال الإشعار لستارة الأندرويد
         function triggerLoudAlarmAndNotification() {
             const titleText = "أوردر جديد - Dr. Broast 🍗";
             const bodyText = "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!";
@@ -531,7 +526,7 @@
                         icon: "./images/logotempo.png",
                         badge: "./images/logotempo.png",
                         vibrate: [500, 150, 500, 150, 500],
-                        tag: "dr-broast-order",
+                        tag: "dr-broast-order-" + Date.now(),
                         renotify: true,
                         requireInteraction: true
                     });
@@ -555,7 +550,19 @@
             playBellNotification();
         }
 
-        // جرس التنبيه الأصلي لـ Dr. Broast
+        // زر التجربة المباشر للإشعار
+        function testNotificationDirectly() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted') {
+                        triggerLoudAlarmAndNotification();
+                    } else {
+                        alert("⚠️ يرجى السماح بالإشعارات من إعدادات المتصفح");
+                    }
+                });
+            }
+        }
+
         function playBellSoundOnce(audioCtx) {
             const now = audioCtx.currentTime;
             [1046.5, 2093.0].forEach(freq => { 
@@ -1027,7 +1034,6 @@
 
             const itemsDetails = cart.map((i, index) => `${index + 1}. ${i.name} [العدد: ${i.qty}] - ${i.isPercent ? i.rawPrice : (i.price * i.qty) + ' ج.م'}`).join('\n');
 
-            // حفظ الطلب في Firebase لتنبيه صاحب المطعم فوراً
             db.ref('orders').push({
                 name: n,
                 phone: p,
@@ -1087,7 +1093,11 @@
                 localStorage.setItem('admin_login_count', '1');
                 
                 if ("Notification" in window) {
-                    Notification.requestPermission();
+                    Notification.requestPermission().then(perm => {
+                        if (perm === 'granted') {
+                            triggerLoudAlarmAndNotification();
+                        }
+                    });
                 }
 
                 closeLoginModal();
