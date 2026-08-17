@@ -15,7 +15,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDKs v8 -->
+    <!-- Firebase SDKs v8 المباشرة -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -47,7 +47,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
         body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 70px; }
 
-        /* الحاوية المركزية للوجو والأيقونة فوقه */
+        /* الحاوية المركزية للوجو والشارة فوقه */
         .logo-center-wrapper {
             display: flex;
             flex-direction: column;
@@ -208,7 +208,7 @@
 
         .footer-rights { font-size: 0.8rem; color: var(--main-text); font-weight: 700; }
 
-        /* مودال السلة والدفع */
+        /* مودال السلة المنظم والدفع الحصري */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 2000; display: none; justify-content: center; align-items: flex-end; }
         .modal-content { background: var(--white); width: 100%; max-width: 500px; padding: 25px; border-radius: 30px 30px 0 0; max-height: 90vh; overflow-y: auto; color: var(--main-text); }
         .cart-item-card { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border-subtle); }
@@ -219,13 +219,30 @@
         .cart-item-price { color: var(--accent); font-weight: 900; font-size: 0.88rem; display: block; margin-top: 2px; }
         .remove-btn { color: #ff3b30; font-weight: 800; font-size: 0.75rem; cursor: pointer; padding: 4px 8px; }
 
-        .order-type-container { display: flex; background: var(--bg); padding: 6px; border-radius: 16px; margin: 10px 0; gap: 6px; border: 1px solid var(--border-subtle); }
-        .order-type-btn { flex: 1; border: none; background: transparent; padding: 10px 4px; border-radius: 12px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; color: var(--desc-text); transition: all 0.3s ease; white-space: nowrap; }
-        .order-type-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
+        /* أزرار السلة المنظمة (نوع الطلب + طريقة الدفع) */
+        .option-group-label { font-size: 0.85rem; font-weight: 800; color: var(--main-text); margin: 12px 0 6px 0; display: block; }
+        .options-selector-bar { display: flex; background: var(--bg); padding: 5px; border-radius: 16px; gap: 6px; border: 1px solid var(--border-subtle); }
+        .option-choice-btn {
+            flex: 1; border: none; background: transparent; padding: 9px 4px; border-radius: 12px;
+            font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 4px; color: var(--desc-text); transition: all 0.25s ease;
+        }
+        .option-choice-btn.selected {
+            background: var(--accent) !important;
+            color: #ffffff !important;
+            box-shadow: 0 3px 10px var(--accent-glow);
+        }
 
-        .user-fields input { background: var(--bg); border: 1px solid var(--border-subtle); padding: 16px; border-radius: 14px; width: 100%; margin-bottom: 10px; color: var(--main-text); text-align: right; font-weight: 600; outline: none; }
+        .payment-info-box {
+            background: var(--bg); border: 1.5px dashed var(--border-subtle);
+            padding: 10px 14px; border-radius: 14px; margin: 12px 0;
+            display: none; align-items: center; justify-content: space-between;
+        }
+        .payment-info-box.show { display: flex; }
+
+        .user-fields input { background: var(--bg); border: 1px solid var(--border-subtle); padding: 14px; border-radius: 14px; width: 100%; margin-bottom: 10px; color: var(--main-text); text-align: right; font-weight: 600; outline: none; }
         .user-fields input:focus { border-color: var(--accent); }
-        .submit-btn { background: var(--accent); color: white; border: none; padding: 17px; border-radius: 18px; width: 100%; font-weight: 900; cursor: pointer; font-size: 1rem; box-shadow: 0 6px 18px var(--accent-glow); }
+        .submit-btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 18px; width: 100%; font-weight: 900; cursor: pointer; font-size: 1rem; box-shadow: 0 6px 18px var(--accent-glow); margin-top: 5px; }
 
         /* مودال واجهة الإدارة والتحكم */
         .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 16px; backdrop-filter: blur(4px); }
@@ -262,13 +279,14 @@
         .login-card-box input:focus, .pass-card-box input:focus { border-color: #d85000; }
         .login-btn, .pass-save-btn { width: 100%; background: linear-gradient(90deg, #d85000, #f95e07); color: white; border: none; padding: 13px; border-radius: 14px; font-weight: 900; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 12px rgba(216, 80, 0, 0.25); }
 
-        /* سجل الطلبات */
-        .order-log-card { background: white; padding: 16px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #eaecf0; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        /* سجل الطلبات المنظم */
+        .order-log-card { background: #ffffff; padding: 16px; border-radius: 20px; margin-bottom: 14px; border: 1px solid #eaecf0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         .order-log-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eaecf0; padding-bottom: 8px; margin-bottom: 10px; }
-        .order-log-name { font-weight: 900; font-size: 0.95rem; color: #1d2939; }
-        .order-log-price { font-weight: 900; color: #d85000; font-size: 1rem; background: #fff2ea; padding: 2px 10px; border-radius: 10px; }
-        .order-log-info { font-size: 0.83rem; color: #344054; font-weight: 700; margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
-        .order-items-box { background: #f8f9fa; padding: 10px; border-radius: 12px; margin-top: 8px; font-size: 0.8rem; color: #475467; border: 1px solid #f2f4f7; }
+        .order-log-name { font-weight: 900; font-size: 0.98rem; color: #1d2939; }
+        .order-log-price { font-weight: 900; color: #d85000; font-size: 1.05rem; background: #fff2ea; padding: 3px 12px; border-radius: 10px; }
+        .order-log-info { font-size: 0.84rem; color: #344054; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .order-items-box { background: #f8f9fa; padding: 12px; border-radius: 14px; margin-top: 8px; font-size: 0.82rem; color: #475467; border: 1px solid #eaecf0; line-height: 1.6; }
+        .order-log-time { font-size: 0.72rem; color: #98a2b3; font-weight: 700; margin-top: 8px; text-align: left; }
     </style>
 </head>
 <body>
@@ -354,30 +372,35 @@
         <p class="footer-rights">جميع الحقوق محفوظة لـ مطعم Dr. Broast 2026 ©</p>
     </footer>
 
-    <!-- نافذة السلة -->
+    <!-- نافذة السلة المنظمة بالكامل -->
     <div class="modal" id="cartModal" onclick="if(event.target==this) toggleCart(false)">
         <div class="modal-content">
-            <h2 style="margin-bottom: 20px; font-weight: 900;">طلباتك</h2>
+            <h2 style="margin-bottom: 15px; font-weight: 900;">طلباتك 🛒</h2>
             <div id="cartItemsList"></div>
-            <div style="margin: 15px 0; padding: 16px; background: var(--accent-light); border: 1px solid var(--border-subtle); border-radius: 18px; display: flex; justify-content: space-between; align-items: center;">
+            
+            <div style="margin: 15px 0; padding: 14px; background: var(--accent-light); border: 1px solid var(--border-subtle); border-radius: 18px; display: flex; justify-content: space-between; align-items: center;">
                 <b style="font-size: 1.05rem;">المجموع الكلي</b>
                 <b id="totalAmount" style="color: var(--accent); font-size: 1.15rem;">0 ج.م</b>
             </div>
 
-            <div class="order-type-container">
-                <button type="button" class="order-type-btn active" id="deliveryBtn" onclick="setOrderType('delivery')">🛵 دليفري</button>
-                <button type="button" class="order-type-btn" id="dineInBtn" onclick="setOrderType('dineIn')">🍽️ صالة</button>
-                <button type="button" class="order-type-btn" id="pickupBtn" onclick="setOrderType('pickup')">🛍️ استلام من المطعم</button>
+            <!-- اختيار نوع الاستلام مع إزالة التضارب -->
+            <span class="option-group-label">🛵 نوع الاستلام:</span>
+            <div class="options-selector-bar">
+                <button type="button" class="option-choice-btn selected" id="btnTypeDelivery" onclick="setOrderType('delivery')">🛵 دليفري</button>
+                <button type="button" class="option-choice-btn" id="btnTypeDineIn" onclick="setOrderType('dineIn')">🍽️ صالة</button>
+                <button type="button" class="option-choice-btn" id="btnTypePickup" onclick="setOrderType('pickup')">🛍️ استلام</button>
             </div>
 
-            <div style="margin-top: 15px; margin-bottom: 5px; font-weight: 800; font-size: 0.9rem; color: var(--main-text);">💳 طريقة الدفع:</div>
-            <div class="order-type-container">
-                <button type="button" class="order-type-btn active" id="payCashBtn" onclick="setPaymentMethod('cash')">💵 نقدي</button>
-                <button type="button" class="order-type-btn" id="payVfBtn" onclick="setPaymentMethod('vfcash')">📱 محفظة إلكترونية</button>
-                <button type="button" class="order-type-btn" id="payInstaBtn" onclick="setPaymentMethod('instapay')">⚡ إنستا باي</button>
+            <!-- اختيار طريقة الدفع الحصرية مع إزالة التضارب -->
+            <span class="option-group-label">💳 طريقة الدفع:</span>
+            <div class="options-selector-bar">
+                <button type="button" class="option-choice-btn selected" id="btnPayCash" onclick="setPaymentMethod('cash')">💵 نقدي</button>
+                <button type="button" class="option-choice-btn" id="btnPayVf" onclick="setPaymentMethod('vfcash')">📱 محفظة</button>
+                <button type="button" class="option-choice-btn" id="btnPayInsta" onclick="setPaymentMethod('instapay')">⚡ إنستا باي</button>
             </div>
 
-            <div id="paymentInfoBox" style="display: none; background: var(--bg); border: 1.5px dashed var(--border-subtle); padding: 10px 14px; border-radius: 14px; margin-bottom: 15px; align-items: center; justify-content: space-between;">
+            <!-- صندوق معلومات التحويل مع زر النسخ -->
+            <div id="paymentInfoBox" class="payment-info-box">
                 <div>
                     <span id="paymentMethodLabel" style="font-size: 0.8rem; font-weight: 700; color: var(--desc-text); display: block;">رقم التحويل:</span>
                     <b id="paymentNumberDisplay" style="font-size: 1.02rem; color: var(--accent);">01091669151</b>
@@ -385,7 +408,7 @@
                 <button type="button" onclick="copyPaymentNumber()" id="copyBtn" style="background: var(--accent-light); border: 1.5px solid var(--accent); color: var(--accent); padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer;">📋 نسخ</button>
             </div>
 
-            <div class="user-fields">
+            <div class="user-fields" style="margin-top: 15px;">
                 <input type="text" id="uName" placeholder="الاسم بالكامل">
                 <input type="tel" id="uPhone" placeholder="رقم الموبايل">
                 <input type="text" id="uAddr" placeholder="العنوان بالتفصيل">
@@ -487,7 +510,7 @@
             if (menuData.length > 0) renderNav();
         });
 
-        // الاستماع الفوري لكل طلب جديد وتسجيله وتنبيه صاحب المطعم
+        // الاستماع الفوري لكل طلب جديد
         db.ref('orders').limitToLast(1).on('child_added', snap => {
             if (isFirstOrdersLoad) {
                 isFirstOrdersLoad = false;
@@ -974,33 +997,51 @@
             else { modal.style.display = 'none'; } 
         }
 
+        // تحديد نوع الاستلام المنظم (إلغاء التحديد عن الباقي)
         function setOrderType(type) {
             selectedOrderType = type;
-            document.querySelectorAll('#cartModal .order-type-container:first-of-type .order-type-btn').forEach(b => b.classList.remove('active'));
-            if (type === 'delivery') { document.getElementById('deliveryBtn').classList.add('active'); document.getElementById('uAddr').style.display = 'block'; }
-            if (type === 'dineIn') { document.getElementById('dineInBtn').classList.add('active'); document.getElementById('uAddr').style.display = 'none'; }
-            if (type === 'pickup') { document.getElementById('pickupBtn').classList.add('active'); document.getElementById('uAddr').style.display = 'none'; }
+            
+            document.getElementById('btnTypeDelivery').classList.remove('selected');
+            document.getElementById('btnTypeDineIn').classList.remove('selected');
+            document.getElementById('btnTypePickup').classList.remove('selected');
+
+            const addrInput = document.getElementById('uAddr');
+
+            if (type === 'delivery') {
+                document.getElementById('btnTypeDelivery').classList.add('selected');
+                addrInput.style.display = 'block';
+            } else if (type === 'dineIn') {
+                document.getElementById('btnTypeDineIn').classList.add('selected');
+                addrInput.style.display = 'none';
+            } else if (type === 'pickup') {
+                document.getElementById('btnTypePickup').classList.add('selected');
+                addrInput.style.display = 'none';
+            }
         }
 
+        // تحديد طريقة الدفع المنظمة (إلغاء التحديد عن الباقي)
         function setPaymentMethod(method) {
             selectedPaymentMethod = method;
+            
+            document.getElementById('btnPayCash').classList.remove('selected');
+            document.getElementById('btnPayVf').classList.remove('selected');
+            document.getElementById('btnPayInsta').classList.remove('selected');
+
             const infoBox = document.getElementById('paymentInfoBox');
             const paymentLabel = document.getElementById('paymentMethodLabel');
             const paymentNum = document.getElementById('paymentNumberDisplay');
 
-            document.querySelectorAll('#cartModal .order-type-container:nth-of-type(2) .order-type-btn').forEach(b => b.classList.remove('active'));
-
             if (method === 'cash') {
-                document.getElementById('payCashBtn').classList.add('active');
-                infoBox.style.display = 'none';
+                document.getElementById('btnPayCash').classList.add('selected');
+                infoBox.classList.remove('show');
             } else if (method === 'vfcash') {
-                document.getElementById('payVfBtn').classList.add('active');
-                infoBox.style.display = 'flex';
+                document.getElementById('btnPayVf').classList.add('selected');
+                infoBox.classList.add('show');
                 paymentLabel.innerText = 'رقم التحويل (محفظة إلكترونية):';
                 paymentNum.innerText = VF_CASH_NUM;
             } else if (method === 'instapay') {
-                document.getElementById('payInstaBtn').classList.add('active');
-                infoBox.style.display = 'flex';
+                document.getElementById('btnPayInsta').classList.add('selected');
+                infoBox.classList.add('show');
                 paymentLabel.innerText = 'رقم التحويل (إنستا باي):';
                 paymentNum.innerText = INSTAPAY_NUM;
             }
@@ -1047,7 +1088,7 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
-            // الحفظ في قاعدة البيانات فورياً
+            // الحفظ المؤكد في Firebase
             db.ref('orders').push(orderData).then(() => {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "تأكيد الطلب عبر واتساب";
@@ -1201,7 +1242,7 @@
             });
         }
 
-        // عرض وتحميل سجل الطلبات كاملاً بدون فقدان أي طلب
+        // عرض وتحميل سجل الطلبات لحظياً فور إضافتها
         function listenToOrdersLog() {
             const container = document.getElementById('adminOrdersList');
             container.innerHTML = '<div style="text-align:center; padding: 20px; font-weight:800; color:#667085;">جاري تحميل سجل الطلبات...</div>';
@@ -1232,7 +1273,7 @@
                                 <div style="white-space: pre-line;">${o.details}</div>
                             </div>
 
-                            <div style="font-size: 0.72rem; color: #98a2b3; font-weight: 700; margin-top: 8px; text-align: left;">📅 ${dateStr}</div>
+                            <div class="order-log-time">📅 ${dateStr}</div>
                         </div>
                     `;
                 });
