@@ -15,7 +15,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDKs v8 المباشرة -->
+    <!-- Firebase SDKs v8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -219,7 +219,7 @@
         .cart-item-price { color: var(--accent); font-weight: 900; font-size: 0.88rem; display: block; margin-top: 2px; }
         .remove-btn { color: #ff3b30; font-weight: 800; font-size: 0.75rem; cursor: pointer; padding: 4px 8px; }
 
-        /* أزرار السلة المنظمة (نوع الطلب + طريقة الدفع) */
+        /* أزرار السلة المنظمة */
         .option-group-label { font-size: 0.85rem; font-weight: 800; color: var(--main-text); margin: 12px 0 6px 0; display: block; }
         .options-selector-bar { display: flex; background: var(--bg); padding: 5px; border-radius: 16px; gap: 6px; border: 1px solid var(--border-subtle); }
         .option-choice-btn {
@@ -244,23 +244,35 @@
         .user-fields input:focus { border-color: var(--accent); }
         .submit-btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 18px; width: 100%; font-weight: 900; cursor: pointer; font-size: 1rem; box-shadow: 0 6px 18px var(--accent-glow); margin-top: 5px; }
 
-        /* مودال واجهة الإدارة والتحكم */
-        .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 16px; backdrop-filter: blur(4px); }
-        .admin-card { background: #f3f4f8; width: 100%; max-width: 440px; border-radius: 28px; padding: 22px 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 1px solid #ffffff; }
+        /* مودال واجهة الإدارة والتحكم (معدل بالكامل لضمان السكرول السلس) */
+        .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 12px; backdrop-filter: blur(4px); }
+        .admin-card { 
+            background: #f3f4f8; width: 100%; max-width: 440px; border-radius: 28px; 
+            padding: 20px 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); 
+            height: 85vh; max-height: 700px; display: flex; flex-direction: column; 
+            border: 1px solid #ffffff; 
+        }
         
-        .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px dashed #d0d5dd; }
-        .admin-header-title { font-size: 1.25rem; font-weight: 900; color: #d85000; display: flex; align-items: center; gap: 6px; }
+        .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed #d0d5dd; flex-shrink: 0; }
+        .admin-header-title { font-size: 1.2rem; font-weight: 900; color: #d85000; display: flex; align-items: center; gap: 6px; }
         .admin-close-btn { width: 34px; height: 34px; background: #e4e7ec; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; cursor: pointer; color: #344054; border: none; }
 
-        .admin-tabs { display: flex; background: #e4e7ec; padding: 4px; border-radius: 18px; margin-bottom: 16px; gap: 4px; }
-        .admin-tab-btn { flex: 1; border: none; background: transparent; padding: 10px 4px; border-radius: 14px; font-size: 0.85rem; font-weight: 800; color: #475467; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.25s ease; }
+        .admin-tabs { display: flex; background: #e4e7ec; padding: 4px; border-radius: 18px; margin-bottom: 12px; gap: 4px; flex-shrink: 0; }
+        .admin-tab-btn { flex: 1; border: none; background: transparent; padding: 10px 4px; border-radius: 14px; font-size: 0.82rem; font-weight: 800; color: #475467; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.25s ease; }
         .admin-tab-btn.active { background: #d85000; color: #ffffff; box-shadow: 0 4px 12px rgba(216, 80, 0, 0.3); }
 
-        .admin-bulk-actions { display: flex; gap: 10px; margin-bottom: 14px; }
-        .btn-bulk-enable { flex: 1; background: #12a150; color: white; border: none; padding: 12px 6px; border-radius: 14px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 4px 10px rgba(18, 161, 80, 0.2); }
-        .btn-bulk-disable { flex: 1; background: #d85000; color: white; border: none; padding: 12px 6px; border-radius: 14px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 4px 10px rgba(216, 80, 0, 0.2); }
+        .admin-bulk-actions { display: flex; gap: 10px; margin-bottom: 10px; flex-shrink: 0; }
+        .btn-bulk-enable { flex: 1; background: #12a150; color: white; border: none; padding: 10px 6px; border-radius: 14px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .btn-bulk-disable { flex: 1; background: #d85000; color: white; border: none; padding: 10px 6px; border-radius: 14px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
 
-        .admin-scroll-area { overflow-y: auto; flex: 1; padding-left: 4px; padding-right: 4px; scrollbar-width: thin; }
+        /* منطقة التمرير المرنة لسجل الطلبات والأصناف */
+        .admin-scroll-area { 
+            overflow-y: auto !important; 
+            -webkit-overflow-scrolling: touch;
+            flex: 1; 
+            padding: 4px 2px 20px 2px; 
+            scrollbar-width: thin; 
+        }
         
         .admin-item-row { background: #ffffff; padding: 14px 16px; border-radius: 18px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #eaecf0; }
         .admin-item-title { font-weight: 800; font-size: 0.92rem; color: #1d2939; }
@@ -279,13 +291,13 @@
         .login-card-box input:focus, .pass-card-box input:focus { border-color: #d85000; }
         .login-btn, .pass-save-btn { width: 100%; background: linear-gradient(90deg, #d85000, #f95e07); color: white; border: none; padding: 13px; border-radius: 14px; font-weight: 900; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 12px rgba(216, 80, 0, 0.25); }
 
-        /* سجل الطلبات المنظم */
-        .order-log-card { background: #ffffff; padding: 16px; border-radius: 20px; margin-bottom: 14px; border: 1px solid #eaecf0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .order-log-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eaecf0; padding-bottom: 8px; margin-bottom: 10px; }
-        .order-log-name { font-weight: 900; font-size: 0.98rem; color: #1d2939; }
-        .order-log-price { font-weight: 900; color: #d85000; font-size: 1.05rem; background: #fff2ea; padding: 3px 12px; border-radius: 10px; }
-        .order-log-info { font-size: 0.84rem; color: #344054; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-        .order-items-box { background: #f8f9fa; padding: 12px; border-radius: 14px; margin-top: 8px; font-size: 0.82rem; color: #475467; border: 1px solid #eaecf0; line-height: 1.6; }
+        /* كارت سجل الطلبات */
+        .order-log-card { background: #ffffff; padding: 15px; border-radius: 20px; margin-bottom: 12px; border: 1px solid #eaecf0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .order-log-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eaecf0; padding-bottom: 8px; margin-bottom: 8px; }
+        .order-log-name { font-weight: 900; font-size: 0.95rem; color: #1d2939; }
+        .order-log-price { font-weight: 900; color: #d85000; font-size: 1rem; background: #fff2ea; padding: 2px 10px; border-radius: 10px; }
+        .order-log-info { font-size: 0.82rem; color: #344054; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+        .order-items-box { background: #f8f9fa; padding: 10px; border-radius: 12px; margin-top: 8px; font-size: 0.8rem; color: #475467; border: 1px solid #eaecf0; line-height: 1.5; }
         .order-log-time { font-size: 0.72rem; color: #98a2b3; font-weight: 700; margin-top: 8px; text-align: left; }
     </style>
 </head>
@@ -372,7 +384,7 @@
         <p class="footer-rights">جميع الحقوق محفوظة لـ مطعم Dr. Broast 2026 ©</p>
     </footer>
 
-    <!-- نافذة السلة المنظمة بالكامل -->
+    <!-- نافذة السلة -->
     <div class="modal" id="cartModal" onclick="if(event.target==this) toggleCart(false)">
         <div class="modal-content">
             <h2 style="margin-bottom: 15px; font-weight: 900;">طلباتك 🛒</h2>
@@ -383,7 +395,6 @@
                 <b id="totalAmount" style="color: var(--accent); font-size: 1.15rem;">0 ج.م</b>
             </div>
 
-            <!-- اختيار نوع الاستلام مع إزالة التضارب -->
             <span class="option-group-label">🛵 نوع الاستلام:</span>
             <div class="options-selector-bar">
                 <button type="button" class="option-choice-btn selected" id="btnTypeDelivery" onclick="setOrderType('delivery')">🛵 دليفري</button>
@@ -391,7 +402,6 @@
                 <button type="button" class="option-choice-btn" id="btnTypePickup" onclick="setOrderType('pickup')">🛍️ استلام</button>
             </div>
 
-            <!-- اختيار طريقة الدفع الحصرية مع إزالة التضارب -->
             <span class="option-group-label">💳 طريقة الدفع:</span>
             <div class="options-selector-bar">
                 <button type="button" class="option-choice-btn selected" id="btnPayCash" onclick="setPaymentMethod('cash')">💵 نقدي</button>
@@ -399,7 +409,6 @@
                 <button type="button" class="option-choice-btn" id="btnPayInsta" onclick="setPaymentMethod('instapay')">⚡ إنستا باي</button>
             </div>
 
-            <!-- صندوق معلومات التحويل مع زر النسخ -->
             <div id="paymentInfoBox" class="payment-info-box">
                 <div>
                     <span id="paymentMethodLabel" style="font-size: 0.8rem; font-weight: 700; color: var(--desc-text); display: block;">رقم التحويل:</span>
@@ -419,7 +428,7 @@
 
     <!-- نافذة تسجيل الدخول للمدير -->
     <div class="admin-modal" id="loginModal" onclick="if(event.target==this) closeLoginModal()">
-        <div class="admin-card">
+        <div class="admin-card" style="height: auto; max-height: 480px;">
             <div class="admin-header">
                 <div class="admin-header-title">🔐 تسجيل الدخول</div>
                 <button class="admin-close-btn" onclick="closeLoginModal()">✕</button>
@@ -437,7 +446,7 @@
         </div>
     </div>
 
-    <!-- مودال واجهة الإدارة والتحكم -->
+    <!-- مودال واجهة الإدارة والتحكم (معدل بالكامل لضمان السكرول والتصفح) -->
     <div class="admin-modal" id="adminModal" onclick="if(event.target==this) closeAdmin()">
         <div class="admin-card">
             <div class="admin-header">
@@ -451,8 +460,9 @@
                 <button class="admin-tab-btn" id="tabPassBtn" onclick="switchAdminTab('pass')">🔑 كلمة السر</button>
             </div>
 
+            <!-- تبويب حالة الأصناف -->
             <div id="tabStatusContent" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-                <button onclick="testNotificationDirectly()" style="background: #1877F2; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-bottom: 10px;">🔔 اضغط هنا لاختبار الإشعار في هاتفك الآن</button>
+                <button onclick="testNotificationDirectly()" style="background: #1877F2; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 800; font-size: 0.82rem; cursor: pointer; margin-bottom: 10px; flex-shrink: 0;">🔔 اضغط هنا لاختبار الإشعار في هاتفك الآن</button>
 
                 <div class="admin-bulk-actions">
                     <button class="btn-bulk-enable" onclick="toggleAllItems(true)">✅ تشغيل جميع الأصناف</button>
@@ -461,11 +471,13 @@
                 <div class="admin-scroll-area" id="adminItemsList"></div>
             </div>
 
-            <div id="tabOrdersContent" style="display: none; flex: 1; overflow: hidden;">
+            <!-- تبويب سجل الطلبات (تمرير سلس وسريع) -->
+            <div id="tabOrdersContent" style="display: none; flex-direction: column; flex: 1; overflow: hidden;">
                 <div class="admin-scroll-area" id="adminOrdersList"></div>
             </div>
 
-            <div id="tabPassContent" style="display: none; flex: 1;">
+            <!-- تبويب كلمة السر -->
+            <div id="tabPassContent" style="display: none; flex-direction: column; flex: 1; overflow-y: auto;">
                 <div class="pass-card-box">
                     <label>كلمة السر الحالية</label>
                     <input type="password" id="oldPass" placeholder="أدخل كلمة السر الحالية">
@@ -997,7 +1009,6 @@
             else { modal.style.display = 'none'; } 
         }
 
-        // تحديد نوع الاستلام المنظم (إلغاء التحديد عن الباقي)
         function setOrderType(type) {
             selectedOrderType = type;
             
@@ -1019,7 +1030,6 @@
             }
         }
 
-        // تحديد طريقة الدفع المنظمة (إلغاء التحديد عن الباقي)
         function setPaymentMethod(method) {
             selectedPaymentMethod = method;
             
@@ -1054,7 +1064,6 @@
             setTimeout(() => { document.getElementById('copyBtn').innerText = '📋 نسخ'; }, 2000);
         }
 
-        // إرسال الطلب وحفظه مباشرة في Firebase والسجل
         function sendToWA() {
             const n = document.getElementById('uName').value.trim();
             const p = document.getElementById('uPhone').value.trim();
@@ -1088,7 +1097,6 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
-            // الحفظ المؤكد في Firebase
             db.ref('orders').push(orderData).then(() => {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "تأكيد الطلب عبر واتساب";
@@ -1180,11 +1188,11 @@
                 renderAdminItems();
             } else if(tab === 'orders') {
                 document.getElementById('tabOrdersBtn').classList.add('active');
-                document.getElementById('tabOrdersContent').style.display = 'block';
+                document.getElementById('tabOrdersContent').style.display = 'flex';
                 listenToOrdersLog();
             } else if(tab === 'pass') {
                 document.getElementById('tabPassBtn').classList.add('active');
-                document.getElementById('tabPassContent').style.display = 'block';
+                document.getElementById('tabPassContent').style.display = 'flex';
             }
         }
 
@@ -1242,7 +1250,7 @@
             });
         }
 
-        // عرض وتحميل سجل الطلبات لحظياً فور إضافتها
+        // عرض وتحميل سجل الطلبات مع التمرير السلس
         function listenToOrdersLog() {
             const container = document.getElementById('adminOrdersList');
             container.innerHTML = '<div style="text-align:center; padding: 20px; font-weight:800; color:#667085;">جاري تحميل سجل الطلبات...</div>';
@@ -1269,7 +1277,7 @@
                             ${o.address ? `<div class="order-log-info">📍 العنوان: <b>${o.address}</b></div>` : ''}
                             
                             <div class="order-items-box">
-                                <div style="font-weight: 800; margin-bottom: 5px; color: #344054;">🛒 تفاصيل الطلب:</div>
+                                <div style="font-weight: 800; margin-bottom: 4px; color: #344054;">🛒 تفاصيل الطلب:</div>
                                 <div style="white-space: pre-line;">${o.details}</div>
                             </div>
 
