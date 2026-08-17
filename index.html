@@ -6,6 +6,7 @@
     <title>مطعم Dr. Broast | المنيو الرسمي</title>
     
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -13,6 +14,11 @@
     <link rel="apple-touch-icon" href="images/logotempo.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs v8 المعتمدة للعمل اللحظي في الخلفية -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         :root {
             --bg: #f8f4f0; 
@@ -50,8 +56,8 @@
             gap: 5px;
         }
 
-        /* شارة صاحب المطعم الثابتة فوق اللوجو */
-        .owner-top-pill {
+        /* شارة صاحب المطعم الثابتة فوق اللوجو مباشرة */
+        .owner-badge-top {
             background: linear-gradient(135deg, #d85000, #ff9800);
             color: #ffffff;
             font-size: 0.72rem;
@@ -64,9 +70,9 @@
             box-shadow: 0 2px 8px rgba(216, 80, 0, 0.25);
             cursor: pointer;
             border: 1px solid rgba(255, 255, 255, 0.8);
-            animation: fadeInPill 0.3s ease forwards;
+            animation: fadeInBadge 0.3s ease forwards;
         }
-        @keyframes fadeInPill {
+        @keyframes fadeInBadge {
             from { opacity: 0; transform: translateY(-4px); }
             to { opacity: 1; transform: translateY(0); }
         }
@@ -268,9 +274,6 @@
 </head>
 <body>
 
-    <!-- مشغل صوتي صامت مستمر لإبقاء المتصفح متصلاً بالسيرفر أثناء قفل الشاشة -->
-    <audio id="bgKeepAliveAudio" loop style="display:none;" preload="auto"></audio>
-
     <!-- شاشة البداية -->
     <div id="splash-screen">
         <div class="loader-content">
@@ -290,7 +293,7 @@
                 
                 <!-- الحاوية المدمجة للوجو والشارة فوقه مباشرة -->
                 <div class="logo-center-wrapper">
-                    <div id="ownerTopPill" class="owner-top-pill" onclick="openAdminPanel()">
+                    <div id="ownerTopBadge" class="owner-badge-top" onclick="checkAndOpenAdmin()">
                         <span>👑 صاحب المطعم</span>
                     </div>
                     <div class="header-logo-container">
@@ -346,7 +349,7 @@
         </div>
 
         <div>
-            <button class="admin-trigger-btn" onclick="openAdminPanel()">⚙️ إدارة المطعم</button>
+            <button class="admin-trigger-btn" onclick="checkAndOpenAdmin()">⚙️ إدارة المطعم</button>
         </div>
 
         <p class="footer-rights">جميع الحقوق محفوظة لـ مطعم Dr. Broast 2026 ©</p>
@@ -392,78 +395,68 @@
         </div>
     </div>
 
+    <!-- نافذة تسجيل الدخول للمدير -->
+    <div class="admin-modal" id="loginModal" onclick="if(event.target==this) closeLoginModal()">
+        <div class="admin-card">
+            <div class="admin-header">
+                <div class="admin-header-title">🔐 تسجيل الدخول</div>
+                <button class="admin-close-btn" onclick="closeLoginModal()">✕</button>
+            </div>
+            <div class="login-card-box">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 2.5rem; margin-bottom: 5px;">👑</div>
+                    <h3 style="font-weight: 900; color: #1d2939; font-size: 1.1rem;">وضع صاحب المطعم</h3>
+                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل الإشعارات بالهاتف</p>
+                </div>
+                <label>كلمة المرور</label>
+                <input type="password" id="adminPassInput" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyAdminLogin()">
+                <button class="login-btn" onclick="verifyAdminLogin()">دخول وتفعيل إشعارات الهاتف</button>
+            </div>
+        </div>
+    </div>
+
     <!-- مودال واجهة الإدارة والتحكم -->
-    <div class="admin-modal" id="adminModal" onclick="if(event.target==this) closeAdminPanel()">
+    <div class="admin-modal" id="adminModal" onclick="if(event.target==this) closeAdmin()">
         <div class="admin-card">
             <div class="admin-header">
                 <div class="admin-header-title">⚙️ واجهة الإدارة والتحكم</div>
-                <button class="admin-close-btn" onclick="closeAdminPanel()">✕</button>
+                <button class="admin-close-btn" onclick="closeAdmin()">✕</button>
             </div>
 
-            <div id="adminLoginBox" class="login-card-box" style="display: none;">
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <div style="font-size: 2.5rem; margin-bottom: 5px;">🔐</div>
-                    <h3 style="font-weight: 900; color: #1d2939; font-size: 1.1rem;">دخول لوحة التحكم</h3>
-                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل وضع صاحب المطعم واستقبال الإشعارات في الهاتف</p>
-                </div>
-                <label>كلمة المرور</label>
-                <input type="password" id="adminPassLoginInput" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyAdminLogin()">
-                <button class="login-btn" onclick="verifyAdminLogin()">دخول وتفعيل إشعارات الهاتف</button>
+            <div class="admin-tabs">
+                <button class="admin-tab-btn active" id="tabStatusBtn" onclick="switchAdminTab('status')">📦 حالة الأصناف</button>
+                <button class="admin-tab-btn" id="tabOrdersBtn" onclick="switchAdminTab('orders')">📜 سجل الطلبات</button>
+                <button class="admin-tab-btn" id="tabPassBtn" onclick="switchAdminTab('pass')">🔑 كلمة السر</button>
             </div>
 
-            <div id="adminMainContent" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-                <div class="admin-tabs">
-                    <button class="admin-tab-btn active" id="tabStatusBtn" onclick="switchAdminTab('status')">📦 حالة الأصناف</button>
-                    <button class="admin-tab-btn" id="tabOrdersBtn" onclick="switchAdminTab('orders')">📜 سجل الطلبات</button>
-                    <button class="admin-tab-btn" id="tabPassBtn" onclick="switchAdminTab('pass')">🔑 كلمة السر</button>
+            <div id="tabStatusContent" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+                <div class="admin-bulk-actions">
+                    <button class="btn-bulk-enable" onclick="toggleAllItems(true)">✅ تشغيل جميع الأصناف</button>
+                    <button class="btn-bulk-disable" onclick="toggleAllItems(false)">🛑 إيقاف جميع الأصناف</button>
                 </div>
+                <div class="admin-scroll-area" id="adminItemsList"></div>
+            </div>
 
-                <div id="tabStatusContent" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-                    <div class="admin-bulk-actions">
-                        <button class="btn-bulk-enable" onclick="bulkSetStatus(true)">✅ تشغيل جميع الأصناف</button>
-                        <button class="btn-bulk-disable" onclick="bulkSetStatus(false)">🛑 إيقاف جميع الأصناف</button>
-                    </div>
-                    <div class="admin-scroll-area" id="adminItemsList"></div>
-                </div>
+            <div id="tabOrdersContent" style="display: none; flex: 1; overflow: hidden;">
+                <div class="admin-scroll-area" id="adminOrdersList"></div>
+            </div>
 
-                <div id="tabOrdersContent" style="display: none; flex: 1; overflow: hidden;">
-                    <div class="admin-scroll-area" id="adminOrdersList"></div>
-                </div>
-
-                <div id="tabPassContent" style="display: none; flex: 1;">
-                    <div class="pass-card-box">
-                        <label>كلمة السر الحالية</label>
-                        <input type="password" id="currentPassInput" placeholder="أدخل كلمة السر الحالية">
-                        
-                        <label>كلمة السر الجديدة</label>
-                        <input type="password" id="newPassInput" placeholder="أدخل كلمة السر الجديدة">
-                        
-                        <label>إعادة تأكيد كلمة السر الجديدة</label>
-                        <input type="password" id="confirmPassInput" placeholder="أعد كتابة كلمة السر الجديدة">
-                        
-                        <button class="pass-save-btn" onclick="saveNewPassword()">تحديث كلمة السر</button>
-                    </div>
+            <div id="tabPassContent" style="display: none; flex: 1;">
+                <div class="pass-card-box">
+                    <label>كلمة السر الحالية</label>
+                    <input type="password" id="oldPass" placeholder="أدخل كلمة السر الحالية">
+                    
+                    <label>كلمة السر الجديدة</label>
+                    <input type="password" id="newPass" placeholder="أدخل كلمة السر الجديدة">
+                    
+                    <button class="pass-save-btn" onclick="changeAdminPassword()">تحديث كلمة السر</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- تسجيل Service Worker -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
-                    console.log('SW Registered:', reg.scope);
-                }).catch(err => console.log('SW Fail:', err));
-            });
-        }
-    </script>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
+        // 1. تهيئة الفايربيز SDK v8 المباشرة
         const firebaseConfig = {
             apiKey: "AIzaSyDgTJ7Q8Vyi1Cd3ER0wT4qOaet5Wd_D8o8",
             authDomain: "drbroast.firebaseapp.com",
@@ -474,71 +467,46 @@
             appId: "1:1011507592392:web:8c4b8a67d646634cc879fd"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        window.getGlobalPassToken = async function() {
-            try {
-                const snapshot = await get(ref(database, 'system_config/pass_token'));
-                if (snapshot.exists()) return snapshot.val();
-            } catch(e){}
-            return "default_token_1234";
-        };
+        let adminPassword = "1234";
+        let disabledItems = {};
+        let isFirstOrdersLoad = true;
 
-        window.setGlobalPassToken = function(newPass, newToken) {
-            set(ref(database, 'system_config'), {
-                pass: newPass,
-                pass_token: newToken
-            });
-        };
+        // تسجيل Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW reg failed: ', err));
+        }
 
-        const configRef = ref(database, 'system_config');
-        onValue(configRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.pass_token) {
-                window.serverPass = data.pass || '1234';
-                window.serverToken = data.pass_token;
-                
-                const myToken = localStorage.getItem('dr_owner_token');
-                if (myToken && myToken !== data.pass_token) {
-                    localStorage.removeItem('dr_owner_token');
-                    localStorage.removeItem('dr_login_counter');
-                    if (window.checkOwnerBadge) window.checkOwnerBadge();
-                }
-            }
+        // طلب صلاحيات الإشعارات للنظام
+        if ("Notification" in window && Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        // جلب كلمة السر وحالة الأصناف المعطلة لحظياً
+        db.ref('admin/password').on('value', snap => {
+            if(snap.exists()) adminPassword = snap.val();
         });
 
-        window.saveOrderToFirebase = function(orderData) {
-            const ordersRef = ref(database, 'orders');
-            return push(ordersRef, orderData);
-        };
+        db.ref('disabledItems').on('value', snap => {
+            disabledItems = snap.val() || {};
+            if (menuData.length > 0) renderNav();
+        });
 
-        let isInitialLoad = true;
-        const ordersRef = ref(database, 'orders');
-        onValue(ordersRef, (snapshot) => {
-            const data = snapshot.val();
-            window.realtimeOrders = data ? Object.values(data).reverse() : [];
+        // الاستماع للأوردرات الجديدة وإطلاق الإنذار والإشعار فوراً لصاحب المطعم
+        db.ref('orders').limitToLast(1).on('child_added', snap => {
+            if (isFirstOrdersLoad) {
+                isFirstOrdersLoad = false;
+                return;
+            }
             
-            if (!isInitialLoad && data) {
-                if (window.isDeviceOwner && window.isDeviceOwner()) {
-                    // تشغيل الصوت التنبيهي
-                    window.playBellNotification();
-
-                    // إرسال الإشعار المكتوب المطابق للصورة تماماً
-                    window.showAndroidPhoneNotification(
-                        "أوردر جديد - Dr. Broast 🍗", 
-                        "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!"
-                    );
-                }
+            const savedPass = localStorage.getItem('owner_saved_pass');
+            if (savedPass && savedPass === adminPassword) {
+                triggerLoudAlarmAndNotification();
             }
-            isInitialLoad = false;
-
-            if(window.renderAdminOrders) window.renderAdminOrders();
         });
-    </script>
 
-    <!-- المنطق الرئيسي والتنبيهات -->
-    <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQYAaXvqYs8Mg1uAiFsjL5l0WMx6ttAhWmbIakcuGzzGtzHw0DDGEBEOFSn0h3z8kaikRFJQ1Mt9wJo/pub?output=csv';
         const IMAGES_PATH = "./images/"; 
         const WA_PHONE = "201091669151"; 
@@ -551,60 +519,43 @@
         let selectedPaymentMethod = 'cash';
         let currentActiveCategory = "";
 
-        let disabledItems = JSON.parse(localStorage.getItem('dr_disabled_items') || '[]');
+        // --- نظام التنبيه والإشعارات المعتمد من التطبيق الشغال ---
+        function triggerLoudAlarmAndNotification() {
+            const titleText = "أوردر جديد - Dr. Broast 🍗";
+            const bodyText = "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!";
 
-        /* محرك إبقاء الاتصال حياً في الخلفية */
-        function enableBackgroundKeepAlive() {
-            try {
-                const audio = document.getElementById('bgKeepAliveAudio');
-                audio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==";
-                audio.play().catch(()=>{});
-            } catch(e){}
-        }
-
-        /* دالة إرسال إشعار النظام المباشر للموبايل */
-        window.showAndroidPhoneNotification = async function(title, body) {
-            if (!("Notification" in window)) return;
-
-            const iconUrl = new URL('images/logotempo.png', window.location.href).href;
-
-            const options = {
-                body: body,
-                icon: iconUrl,
-                badge: iconUrl,
-                vibrate: [500, 200, 500, 200, 600],
-                tag: "drbroast-" + Date.now(),
-                renotify: true,
-                requireInteraction: true,
-                data: { url: window.location.href }
-            };
-
-            const triggerDirect = (reg) => {
-                if (reg && reg.showNotification) {
-                    reg.showNotification(title, options);
-                } else if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage({
-                        type: 'FORCE_SYSTEM_NOTIF',
-                        title: title,
-                        options: options
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification(titleText, {
+                        body: bodyText,
+                        icon: "./images/logotempo.png",
+                        badge: "./images/logotempo.png",
+                        vibrate: [500, 150, 500, 150, 500],
+                        tag: "dr-broast-order",
+                        renotify: true,
+                        requireInteraction: true
                     });
-                }
-            };
-
-            if (Notification.permission === "granted") {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.ready.then(reg => triggerDirect(reg)).catch(() => triggerDirect(null));
-                }
-            } else {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted' && 'serviceWorker' in navigator) {
-                        navigator.serviceWorker.ready.then(reg => triggerDirect(reg));
+                }).catch(() => {
+                    if ("Notification" in window && Notification.permission === "granted") {
+                        new Notification(titleText, {
+                            body: bodyText,
+                            icon: "./images/logotempo.png",
+                            vibrate: [500, 150, 500, 150, 500]
+                        });
                     }
                 });
+            } else if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(titleText, {
+                    body: bodyText,
+                    icon: "./images/logotempo.png",
+                    vibrate: [500, 150, 500, 150, 500]
+                });
             }
-        };
 
-        /* التنبيه الصوتي المعتمد */
+            playBellNotification();
+        }
+
+        // جرس التنبيه الأصلي لـ Dr. Broast
         function playBellSoundOnce(audioCtx) {
             const now = audioCtx.currentTime;
             [1046.5, 2093.0].forEach(freq => { 
@@ -621,100 +572,27 @@
             });
         }
 
-        window.playBellNotification = function() {
+        function playBellNotification() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContext) return;
                 const ctx = new AudioContext();
+                if (ctx.state === 'suspended') ctx.resume();
                 playBellSoundOnce(ctx);
                 setTimeout(() => playBellSoundOnce(ctx), 1000);
             } catch (e) {
                 console.log("Audio alert error:", e);
             }
-        };
-
-        window.isDeviceOwner = function() {
-            const myToken = localStorage.getItem('dr_owner_token');
-            if (!myToken) return false;
-            if (window.serverToken) return (myToken === window.serverToken);
-            return true;
-        };
-
-        window.checkOwnerBadge = function() {
-            const ownerPill = document.getElementById('ownerTopPill');
-            if (window.isDeviceOwner()) {
-                ownerPill.style.display = 'inline-flex';
-                enableBackgroundKeepAlive();
-                if ("Notification" in window && Notification.permission !== "granted") {
-                    Notification.requestPermission();
-                }
-            } else {
-                ownerPill.style.display = 'none';
-            }
-        };
-
-        function openAdminPanel() {
-            const adminModal = document.getElementById('adminModal');
-            const loginBox = document.getElementById('adminLoginBox');
-            const mainContent = document.getElementById('adminMainContent');
-
-            let counter = parseInt(localStorage.getItem('dr_login_counter') || '0');
-
-            if (!window.isDeviceOwner() || counter >= 3) {
-                loginBox.style.display = 'block';
-                mainContent.style.display = 'none';
-                document.getElementById('adminPassLoginInput').value = '';
-            } else {
-                counter++;
-                localStorage.setItem('dr_login_counter', counter.toString());
-                loginBox.style.display = 'none';
-                mainContent.style.display = 'flex';
-                renderAdminStatusItems();
-            }
-
-            adminModal.style.display = 'flex';
         }
 
-        async function verifyAdminLogin() {
-            const enteredPass = document.getElementById('adminPassLoginInput').value.trim();
-            const currentServerPass = window.serverPass || '1234';
-
-            if (enteredPass === currentServerPass) {
-                if ("Notification" in window) {
-                    Notification.requestPermission().then(perm => {
-                        if (perm === 'granted') {
-                            // إشعار تأكيدي فوري يظهر لصاحب المطعم في ستارة الهاتف فور كتابة كلمة السر
-                            window.showAndroidPhoneNotification(
-                                "أوردر جديد - Dr. Broast 🍗", 
-                                "🔔 تم تفعيل إشعارات الهاتف بنجاح! ستصلك جميع الأوردرات هنا."
-                            );
-                        }
-                    });
-                }
-
-                enableBackgroundKeepAlive();
-
-                let currentToken = window.serverToken;
-                if (!currentToken) {
-                    currentToken = "token_" + Date.now();
-                    if (window.setGlobalPassToken) window.setGlobalPassToken(currentServerPass, currentToken);
-                }
-
-                localStorage.setItem('dr_owner_token', currentToken);
-                localStorage.setItem('dr_login_counter', '1');
-
-                window.checkOwnerBadge();
-
-                document.getElementById('adminLoginBox').style.display = 'none';
-                document.getElementById('adminMainContent').style.display = 'flex';
-                renderAdminStatusItems();
+        function checkOwnerBadge() {
+            const savedPass = localStorage.getItem('owner_saved_pass');
+            const ownerBadge = document.getElementById('ownerTopBadge');
+            if (savedPass && savedPass === adminPassword) {
+                ownerBadge.style.display = 'inline-flex';
             } else {
-                alert("❌ كلمة المرور غير صحيحة!");
+                ownerBadge.style.display = 'none';
             }
-        }
-
-        function closeAdminPanel() {
-            document.getElementById('adminModal').style.display = 'none';
         }
 
         function toggleTheme() {
@@ -803,13 +681,13 @@
 
                 setTimeout(() => {
                     document.getElementById('splash-screen').classList.add('splash-hidden');
-                    window.checkOwnerBadge();
+                    checkOwnerBadge();
                 }, 4000);
 
             } catch (e) { 
                 setTimeout(() => {
                     document.getElementById('splash-screen').classList.add('splash-hidden');
-                    window.checkOwnerBadge();
+                    checkOwnerBadge();
                 }, 4000);
             }
         }
@@ -835,7 +713,7 @@
             const isChickenBurger = isChickenBurgerCategory(cat);
             const isBeefBurger = isBeefBurgerCategory(cat);
 
-            const categoryItems = menuData.filter(i => i.category === cat && !disabledItems.includes(i.name));
+            const categoryItems = menuData.filter(i => i.category === cat && !disabledItems[i.name]);
 
             if(categoryItems.length === 0) {
                 document.getElementById('menuList').innerHTML = `<div style="text-align:center; padding: 40px; font-weight:800; color:var(--desc-text);">عذراً، لا توجد أصناف متوفرة حالياً في هذا القسم 🍗</div>`;
@@ -1147,27 +1025,83 @@
             if (selectedPaymentMethod === 'vfcash') payLabel = `📱 محفظة إلكترونية (${VF_CASH_NUM})`;
             if (selectedPaymentMethod === 'instapay') payLabel = `⚡ إنستا باي (${INSTAPAY_NUM})`;
 
-            const orderPayload = {
-                customerName: n, customerPhone: p, customerAddress: selectedOrderType === 'delivery' ? a : '',
-                orderType: selectedOrderType, paymentMethod: selectedPaymentMethod,
-                items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.isPercent ? i.rawPrice : (i.price * i.qty) })),
-                totalAmount: currentTotal, timestamp: Date.now()
-            };
+            const itemsDetails = cart.map((i, index) => `${index + 1}. ${i.name} [العدد: ${i.qty}] - ${i.isPercent ? i.rawPrice : (i.price * i.qty) + ' ج.م'}`).join('\n');
 
-            if (typeof window.saveOrderToFirebase === 'function') {
-                window.saveOrderToFirebase(orderPayload).catch(err => console.error(err));
-            }
+            // حفظ الطلب في Firebase لتنبيه صاحب المطعم فوراً
+            db.ref('orders').push({
+                name: n,
+                phone: p,
+                address: selectedOrderType === 'delivery' ? a : '',
+                orderType: typeLabel,
+                paymentMethod: payLabel,
+                details: itemsDetails,
+                total: currentTotal,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
             
             let msg = `✨ *طلب جديد من مطعم Dr. Broast* ✨\n\n👤 *الاسم:* ${n}\n📱 *الهاتف:* ${p}\n📋 *نوع الطلب:* ${typeLabel}\n💳 *طريقة الدفع:* ${payLabel}\n`;
             if (selectedOrderType === 'delivery') msg += `📍 *العنوان:* ${a}\n`;
-            msg += `\n🛒 *تفاصيل الطلب:* \n---------------------------------\n`;
-            msg += cart.map((i, index) => `${index + 1}. ${i.name} [العدد: ${i.qty}] - ${i.isPercent ? i.rawPrice : (i.price * i.qty) + ' ج.م'}`).join('\n') + `\n---------------------------------\n\n`;
+            msg += `\n🛒 *تفاصيل الطلب:* \n---------------------------------\n${itemsDetails}\n---------------------------------\n\n`;
             msg += `💰 *الإجمالي الكلي:* *${currentTotal} ج.م*\n\nشكراً لاختياركم Dr. Broast! ✨`;
 
             window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
         }
 
-        /* إدارة الأصناف والتبويبات */
+        /* --- لوحة تحكم صاحب المطعم --- */
+        function checkAndOpenAdmin() {
+            const savedPass = localStorage.getItem('owner_saved_pass');
+            let loginCount = parseInt(localStorage.getItem('admin_login_count') || '0');
+
+            if (savedPass && savedPass === adminPassword) {
+                if (loginCount < 3) {
+                    localStorage.setItem('admin_login_count', (loginCount + 1).toString());
+                    showAdminPanel();
+                } else {
+                    openLoginModal();
+                }
+            } else {
+                openLoginModal();
+            }
+        }
+
+        function showAdminPanel() {
+            document.getElementById('adminModal').style.display = 'flex';
+            renderAdminItems();
+            listenToOrdersLog();
+        }
+
+        function openLoginModal() {
+            document.getElementById('adminPassInput').value = '';
+            document.getElementById('loginModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function verifyAdminLogin() {
+            const pass = document.getElementById('adminPassInput').value.trim();
+            if (pass === adminPassword) {
+                localStorage.setItem('owner_saved_pass', pass);
+                localStorage.setItem('admin_login_count', '1');
+                
+                if ("Notification" in window) {
+                    Notification.requestPermission();
+                }
+
+                closeLoginModal();
+                checkOwnerBadge();
+                showAdminPanel();
+            } else {
+                alert("❌ كلمة المرور غير صحيحة!");
+            }
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
         function switchAdminTab(tab) {
             document.getElementById('tabStatusBtn').classList.remove('active');
             document.getElementById('tabOrdersBtn').classList.remove('active');
@@ -1177,133 +1111,108 @@
             document.getElementById('tabOrdersContent').style.display = 'none';
             document.getElementById('tabPassContent').style.display = 'none';
 
-            if (tab === 'status') {
+            if(tab === 'status') {
                 document.getElementById('tabStatusBtn').classList.add('active');
                 document.getElementById('tabStatusContent').style.display = 'flex';
-                renderAdminStatusItems();
-            } else if (tab === 'orders') {
+                renderAdminItems();
+            } else if(tab === 'orders') {
                 document.getElementById('tabOrdersBtn').classList.add('active');
                 document.getElementById('tabOrdersContent').style.display = 'block';
-                renderAdminOrders();
-            } else if (tab === 'pass') {
+                listenToOrdersLog();
+            } else if(tab === 'pass') {
                 document.getElementById('tabPassBtn').classList.add('active');
                 document.getElementById('tabPassContent').style.display = 'block';
             }
         }
 
-        function renderAdminStatusItems() {
-            const listEl = document.getElementById('adminItemsList');
-            listEl.innerHTML = menuData.map(item => {
-                const isOff = disabledItems.includes(item.name);
+        function renderAdminItems() {
+            const list = document.getElementById('adminItemsList');
+            list.innerHTML = menuData.map(item => {
+                const isOff = disabledItems[item.name] === true;
                 return `
-                <div class="admin-item-row">
-                    <div>
-                        <div class="admin-item-title">${item.name}</div>
-                        <div class="admin-item-cat">${item.category}</div>
+                    <div class="admin-item-row">
+                        <div>
+                            <div class="admin-item-title">${item.name}</div>
+                            <div class="admin-item-cat">${item.category}</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" ${!isOff ? 'checked' : ''} onchange="toggleItemStatus('${item.name}', this.checked)">
+                            <span class="slider"></span>
+                        </label>
                     </div>
-                    <label class="switch">
-                        <input type="checkbox" ${!isOff ? 'checked' : ''} onchange="toggleItemAvailability('${item.name}', this.checked)">
-                        <span class="slider"></span>
-                    </label>
-                </div>`;
+                `;
             }).join('');
         }
 
-        function toggleItemAvailability(itemName, isEnabled) {
-            if (isEnabled) {
-                disabledItems = disabledItems.filter(i => i !== itemName);
+        function toggleItemStatus(itemName, isAvailable) {
+            if(isAvailable) {
+                db.ref('disabledItems/' + itemName).remove();
             } else {
-                if (!disabledItems.includes(itemName)) disabledItems.push(itemName);
+                db.ref('disabledItems/' + itemName).set(true);
             }
-            localStorage.setItem('dr_disabled_items', JSON.stringify(disabledItems));
-            filterCat(currentActiveCategory);
         }
 
-        function bulkSetStatus(enableAll) {
-            if (enableAll) {
-                disabledItems = [];
+        function toggleAllItems(enableAll) {
+            if(enableAll) {
+                db.ref('disabledItems').remove();
             } else {
-                disabledItems = menuData.map(i => i.name);
+                let updates = {};
+                menuData.forEach(item => updates[item.name] = true);
+                db.ref('disabledItems').set(updates);
             }
-            localStorage.setItem('dr_disabled_items', JSON.stringify(disabledItems));
-            renderAdminStatusItems();
-            filterCat(currentActiveCategory);
         }
 
-        function renderAdminOrders() {
-            const ordersList = document.getElementById('adminOrdersList');
-            const orders = window.realtimeOrders || [];
+        function changeAdminPassword() {
+            const oldP = document.getElementById('oldPass').value.trim();
+            const newP = document.getElementById('newPass').value.trim();
+            
+            if(oldP !== adminPassword) return alert("❌ كلمة السر الحالية غير صحيحة!");
+            if(!newP) return alert("يرجى كتابة كلمة السر الجديدة");
+            
+            db.ref('admin/password').set(newP).then(() => {
+                alert("تم تحديث كلمة المرور بنجاح! ✓");
+                localStorage.setItem('owner_saved_pass', newP);
+                localStorage.setItem('admin_login_count', '1');
+                document.getElementById('oldPass').value = '';
+                document.getElementById('newPass').value = '';
+                switchAdminTab('status');
+            });
+        }
 
-            if (orders.length === 0) {
-                ordersList.innerHTML = `<div style="text-align:center; padding: 40px; font-weight:800; color:#667085;">لا توجد طلبات مسجلة حالياً</div>`;
-                return;
-            }
-
-            ordersList.innerHTML = orders.map(ord => {
-                const dateStr = new Date(ord.timestamp).toLocaleString('ar-EG');
+        function listenToOrdersLog() {
+            db.ref('orders').limitToLast(20).on('value', snap => {
+                const orders = snap.val();
+                const container = document.getElementById('adminOrdersList');
+                if(!orders) {
+                    container.innerHTML = '<div style="text-align:center; padding: 40px; font-weight:800; color:#667085;">لا توجد طلبات مسجلة حالياً</div>';
+                    return;
+                }
                 
-                let orderTypeAr = '🛵 دليفري';
-                if (ord.orderType === 'dineIn') orderTypeAr = '🍽️ صالة';
-                if (ord.orderType === 'pickup') orderTypeAr = '🛍️ استلام من المطعم';
+                let html = '';
+                Object.keys(orders).reverse().forEach(key => {
+                    const o = orders[key];
+                    const dateStr = o.timestamp ? new Date(o.timestamp).toLocaleString('ar-EG') : '';
+                    html += `
+                        <div class="order-log-card">
+                            <div class="order-log-head">
+                                <span class="order-log-name">👤 ${o.name}</span>
+                                <span class="order-log-price">${o.total} ج.م</span>
+                            </div>
+                            <div class="order-log-info">📱 الموبايل: <b>${o.phone}</b></div>
+                            <div class="order-log-info">📋 النوع: <b>${o.orderType || ''}</b> | 💳 الدفع: <b>${o.paymentMethod || ''}</b></div>
+                            ${o.address ? `<div class="order-log-info">📍 العنوان: <b>${o.address}</b></div>` : ''}
+                            
+                            <div class="order-items-box">
+                                <div style="font-weight: 800; margin-bottom: 5px; color: #344054;">🛒 تفاصيل الطلب:</div>
+                                <div style="white-space: pre-line;">${o.details}</div>
+                            </div>
 
-                let payAr = '💵 نقدي';
-                if (ord.paymentMethod === 'vfcash') payAr = '📱 محفظة إلكترونية';
-                if (ord.paymentMethod === 'instapay') payAr = '⚡ إنستا باي';
-
-                const itemsHtml = (ord.items || []).map(i => `
-                    <div class="order-item-line">
-                        <span>${i.name} <b>x${i.qty}</b></span>
-                        <b>${i.price} ج.م</b>
-                    </div>
-                `).join('');
-
-                return `
-                <div class="order-log-card">
-                    <div class="order-log-head">
-                        <span class="order-log-name">👤 ${ord.customerName}</span>
-                        <span class="order-log-price">${ord.totalAmount} ج.م</span>
-                    </div>
-                    <div class="order-log-info">📱 الموبايل: <b>${ord.customerPhone}</b></div>
-                    <div class="order-log-info">📋 النوع: <b>${orderTypeAr}</b> | 💳 الدفع: <b>${payAr}</b></div>
-                    ${ord.customerAddress ? `<div class="order-log-info">📍 العنوان: <b>${ord.customerAddress}</b></div>` : ''}
-                    
-                    <div class="order-items-box">
-                        <div style="font-weight: 800; margin-bottom: 5px; color: #344054;">🛒 تفاصيل الطلب:</div>
-                        ${itemsHtml}
-                    </div>
-
-                    <div style="font-size: 0.72rem; color: #98a2b3; font-weight: 700; margin-top: 8px; text-align: left;">📅 ${dateStr}</div>
-                </div>`;
-            }).join('');
-        }
-
-        function saveNewPassword() {
-            const currentP = document.getElementById('currentPassInput').value.trim();
-            const p1 = document.getElementById('newPassInput').value.trim();
-            const p2 = document.getElementById('confirmPassInput').value.trim();
-
-            const actualCurrentPass = window.serverPass || '1234';
-
-            if (!currentP || !p1 || !p2) return alert("يرجى ملء جميع الحقول المطلوبة");
-            if (currentP !== actualCurrentPass) return alert("❌ كلمة السر الحالية غير صحيحة!");
-            if (p1 !== p2) return alert("❌ كلمتا السر الجديدتان غير متطابقتين!");
-
-            const newToken = "token_" + Date.now();
-
-            if (window.setGlobalPassToken) {
-                window.setGlobalPassToken(p1, newToken);
-            }
-
-            localStorage.setItem('dr_owner_token', newToken);
-            localStorage.setItem('dr_login_counter', '1');
-
-            alert("تم تحديث كلمة المرور بنجاح! تم حظر الأجهزة السابقة حتى يتم إدخال كلمة المرور الجديدة. ✓");
-
-            document.getElementById('currentPassInput').value = '';
-            document.getElementById('newPassInput').value = '';
-            document.getElementById('confirmPassInput').value = '';
-
-            switchAdminTab('status');
+                            <div style="font-size: 0.72rem; color: #98a2b3; font-weight: 700; margin-top: 8px; text-align: left;">📅 ${dateStr}</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            });
         }
 
         loadMenu();
