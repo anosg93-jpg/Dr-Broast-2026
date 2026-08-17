@@ -41,7 +41,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
         body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 70px; }
 
-        /* شارة صاحب المطعم الفاخرة */
+        /* شارة صاحب المطعم */
         .owner-badge-bar {
             background: linear-gradient(90deg, #d85000, #ff9800);
             color: #ffffff;
@@ -58,65 +58,12 @@
             background: #ffffff;
             color: #d85000;
             border: none;
-            padding: 4px 10px;
-            border-radius: 8px;
+            padding: 5px 12px;
+            border-radius: 10px;
             font-weight: 900;
-            font-size: 0.75rem;
+            font-size: 0.76rem;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* نافذة الإشعار المكتوب المنبثقة على الشاشة (Toast Notification) */
-        #inAppNotificationToast {
-            position: fixed;
-            top: -120px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92%;
-            max-width: 420px;
-            background: #25282b;
-            color: #ffffff;
-            border-radius: 20px;
-            padding: 14px 16px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(255,255,255,0.15);
-            cursor: pointer;
-        }
-        #inAppNotificationToast.show {
-            top: 15px;
-        }
-        .toast-img {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            object-fit: cover;
-            flex-shrink: 0;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .toast-content {
-            flex: 1;
-            text-align: right;
-        }
-        .toast-title {
-            font-size: 0.9rem;
-            font-weight: 900;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .toast-body {
-            font-size: 0.78rem;
-            color: #d0d5dd;
-            font-weight: 700;
-            margin-top: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
 
         /* --- شاشة الترحيب --- */
@@ -269,7 +216,7 @@
         .user-fields input:focus { border-color: var(--accent); }
         .submit-btn { background: var(--accent); color: white; border: none; padding: 17px; border-radius: 18px; width: 100%; font-weight: 900; cursor: pointer; font-size: 1rem; box-shadow: 0 6px 18px var(--accent-glow); }
 
-        /* مودال واجهة الإدارة */
+        /* مودال واجهة الإدارة والتحكم */
         .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 16px; backdrop-filter: blur(4px); }
         .admin-card { background: #f3f4f8; width: 100%; max-width: 440px; border-radius: 28px; padding: 22px 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 1px solid #ffffff; }
         
@@ -316,19 +263,10 @@
 </head>
 <body>
 
-    <!-- نافذة الإشعار المنبثقة الفورية على الشاشة -->
-    <div id="inAppNotificationToast" onclick="this.classList.remove('show')">
-        <img src="images/logotempo.png" class="toast-img" onerror="this.src='images/default.jpg'">
-        <div class="toast-content">
-            <div class="toast-title" id="toastTitle">🍗 أوردر جديد - Dr. Broast</div>
-            <div class="toast-body" id="toastBody">🔔 هناك أوردر جديد تم تأكيده للتو من العميل!</div>
-        </div>
-    </div>
-
-    <!-- شارة صاحب المطعم الفاخرة -->
+    <!-- شارة صاحب المطعم الفاخرة مع زر طلب صلاحيات النظام -->
     <div id="ownerBadgeBar" class="owner-badge-bar">
         <span>👑 وضع صاحب المطعم نشط</span>
-        <button id="notifStatusBtn" class="btn-enable-notif" onclick="askNotificationPermissionExplicitly()">🔔 تفعيل الإشعارات بالهاتف</button>
+        <button id="notifStatusBtn" class="btn-enable-notif" onclick="enableSystemNotifications()">🔔 تفعيل الإشعارات بالهاتف</button>
     </div>
 
     <!-- شاشة البداية -->
@@ -444,7 +382,7 @@
         </div>
     </div>
 
-    <!-- مودال واجهة الإدارة والتحكم -->
+    <!-- مودال واجهة الإدارة والتحكم ودخول كلمة المرور -->
     <div class="admin-modal" id="adminModal" onclick="if(event.target==this) closeAdminPanel()">
         <div class="admin-card">
             <div class="admin-header">
@@ -456,11 +394,11 @@
                 <div style="text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 2.5rem; margin-bottom: 5px;">🔐</div>
                     <h3 style="font-weight: 900; color: #1d2939; font-size: 1.1rem;">دخول لوحة التحكم</h3>
-                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتأكيد هويتك كـ صاحب المطعم</p>
+                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل هوية صاحب المطعم واستقبال الإشعارات في الهاتف</p>
                 </div>
                 <label>كلمة المرور</label>
                 <input type="password" id="adminPassLoginInput" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyAdminLogin()">
-                <button class="login-btn" onclick="verifyAdminLogin()">دخول وتفعيل الإشعارات</button>
+                <button class="login-btn" onclick="verifyAdminLogin()">دخول وتفعيل إشعارات الهاتف</button>
             </div>
 
             <div id="adminMainContent" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
@@ -500,13 +438,15 @@
         </div>
     </div>
 
-    <!-- تسجيل Service Worker -->
+    <!-- تسجيل Service Worker ليعمل في خلفية الهاتف -->
     <script>
+        let swRegistration = null;
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(reg => {
-                    console.log('SW Registered:', reg.scope);
-                }).catch(err => console.log('SW register fail:', err));
+                    swRegistration = reg;
+                    console.log('Service Worker Registered Successfully:', reg.scope);
+                }).catch(err => console.log('SW registration error:', err));
             });
         }
     </script>
@@ -573,12 +513,12 @@
             
             if (!isInitialLoad && data) {
                 if (window.isDeviceOwner && window.isDeviceOwner()) {
-                    // تشغيل الصوت التنبيهي
+                    // تشغيل الصوت التنبيهي المعتمد
                     window.playBellNotification();
 
-                    // إرسال الإشعار الكتابي المطابق للصورة (في شريط النظام + نافذة منبثقة)
+                    // إرسال إشعار كتابي في شريط إشعارات الهاتف وشاشة القفل
                     window.showPushNotification(
-                        "🍗 أوردر جديد - Dr. Broast", 
+                        "أوردر جديد - Dr. Broast 🍗", 
                         "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!"
                     );
                 }
@@ -589,7 +529,7 @@
         });
     </script>
 
-    <!-- المنطق الرئيسي والإشعارات -->
+    <!-- المنطق الرئيسي والتنبيهات -->
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQYAaXvqYs8Mg1uAiFsjL5l0WMx6ttAhWmbIakcuGzzGtzHw0DDGEBEOFSn0h3z8kaikRFJQ1Mt9wJo/pub?output=csv';
         const IMAGES_PATH = "./images/"; 
@@ -605,16 +545,18 @@
 
         let disabledItems = JSON.parse(localStorage.getItem('dr_disabled_items') || '[]');
 
-        /* دالة طلب إذن الإشعارات بشكل صريح ومباشر */
-        function askNotificationPermissionExplicitly() {
+        /* دالة تفعيل صلاحيات إشعارات النظام في الهاتف */
+        function enableSystemNotifications() {
             if ("Notification" in window) {
                 Notification.requestPermission().then(permission => {
                     updateNotifButtonUI();
                     if (permission === 'granted') {
-                        // إشعار تجريبي للتأكيد لصاحب المطعم فور الموافقة
-                        window.showPushNotification("🍗 تم تفعيل الإشعارات - Dr. Broast", "✅ ستصلك جميع الأوردرات الجديدة صوتياً وكتابياً!");
+                        window.showPushNotification(
+                            "أوردر جديد - Dr. Broast 🍗", 
+                            "🔔 تم تفعيل إشعارات الهاتف بنجاح! ستصلك هنا حتى أثناء قفل الشاشة."
+                        );
                     } else {
-                        alert("⚠️ يرجى السماح بالإشعارات من إعدادات المتصفح لتصلك رسائل الأوردرات.");
+                        alert("⚠️ يرجى السماح بالإشعارات من إعدادات المتصفح حتى تظهر الرسائل في ستارة الإشعارات وشاشة القفل.");
                     }
                 });
             }
@@ -624,41 +566,35 @@
             const btn = document.getElementById('notifStatusBtn');
             if (!btn) return;
             if ("Notification" in window && Notification.permission === "granted") {
-                btn.innerText = "✅ الإشعارات مفعلة";
+                btn.innerText = "✅ الإشعارات مفعلة بالهاتف";
                 btn.style.background = "#e6f4ea";
                 btn.style.color = "#137333";
             } else {
-                btn.innerText = "🔔 اضغط لتفعيل الإشعارات";
+                btn.innerText = "🔔 اضغط لتفعيل الإشعارات بالهاتف";
                 btn.style.background = "#ffffff";
                 btn.style.color = "#d85000";
             }
         }
 
-        /* إرسال الإشعار الكتابي (System Notification + In-App Toast) */
+        /* دالة إرسال إشعار النظام الحقيقي للهاتف */
         window.showPushNotification = async function(title, body) {
-            // 1. إظهار كارت الإشعار المنبثق على الشاشة
-            const toast = document.getElementById('inAppNotificationToast');
-            if (toast) {
-                document.getElementById('toastTitle').innerText = title;
-                document.getElementById('toastBody').innerText = body;
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 6000);
-            }
+            if (!("Notification" in window)) return;
 
-            // 2. إرسال إشعار النظام (Service Worker / OS Push)
-            if ("Notification" in window && Notification.permission === "granted") {
-                const options = {
-                    body: body,
-                    icon: "images/logotempo.png",
-                    badge: "images/logotempo.png",
-                    vibrate: [300, 100, 300, 100, 400],
-                    tag: "order-" + Date.now(),
-                    renotify: true,
-                    requireInteraction: true
-                };
+            const options = {
+                body: body,
+                icon: "images/logotempo.png",
+                badge: "images/logotempo.png",
+                vibrate: [400, 200, 400, 200, 600],
+                tag: "order-" + Date.now(),
+                renotify: true,
+                requireInteraction: true,
+                silent: false,
+                data: { url: window.location.href }
+            };
 
+            if (Notification.permission === "granted") {
                 try {
-                    if ('serviceWorker' in navigator) {
+                    if (navigator.serviceWorker) {
                         const reg = await navigator.serviceWorker.ready;
                         if (reg && reg.showNotification) {
                             await reg.showNotification(title, options);
@@ -666,13 +602,15 @@
                         }
                     }
                     new Notification(title, options);
-                } catch (e) {
+                } catch(e) {
                     try { new Notification(title, options); } catch(err) {}
                 }
+            } else {
+                Notification.requestPermission();
             }
         };
 
-        /* صوت الجرس المعتمد بدون تغيير */
+        /* التنبيه الصوتي (جرس التنبيه الأصلي المعتمد) */
         function playBellSoundOnce(audioCtx) {
             const now = audioCtx.currentTime;
             [1046.5, 2093.0].forEach(freq => { 
@@ -745,7 +683,7 @@
             const currentServerPass = window.serverPass || '1234';
 
             if (enteredPass === currentServerPass) {
-                askNotificationPermissionExplicitly();
+                enableSystemNotifications();
 
                 let currentToken = window.serverToken;
                 if (!currentToken) {
@@ -1296,7 +1234,7 @@
                 const dateStr = new Date(ord.timestamp).toLocaleString('ar-EG');
                 
                 let orderTypeAr = '🛵 دليفري';
-                if (ord.orderType === 'dineIn') orderTypeAr = '🍽️ صالة';
+                if (ord.orderType === 'dineIn') orderTypeAr = '??️ صالة';
                 if (ord.orderType === 'pickup') orderTypeAr = '🛍️ استلام من المطعم';
 
                 let payAr = '💵 نقدي';
