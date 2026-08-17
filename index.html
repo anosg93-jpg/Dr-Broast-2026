@@ -28,6 +28,8 @@
             --success-dark: #2b1810; 
             --header-bg: #ffffff;
             --border-subtle: rgba(249, 94, 7, 0.15);
+            --danger: #e74c3c;
+            --success-green: #27ae60;
         }
 
         body.dark-mode {
@@ -155,8 +157,16 @@
         
         .menu-list { padding: 15px; max-width: 600px; margin: auto; }
         
+        /* تنبيه إيقاف المنيو */
+        .menu-disabled-alert {
+            background: #ffebee; color: var(--danger); border: 2px dashed var(--danger);
+            padding: 20px; border-radius: 20px; text-align: center; font-weight: 800;
+            margin: 20px auto; max-width: 600px; font-size: 1.1rem;
+        }
+
         /* كروت المنيو العادية */
-        .food-card { background: var(--white); border-radius: 24px; margin-bottom: 16px; display: flex; padding: 16px; gap: 15px; align-items: flex-start; box-shadow: 0 6px 18px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); }
+        .food-card { background: var(--white); border-radius: 24px; margin-bottom: 16px; display: flex; padding: 16px; gap: 15px; align-items: flex-start; box-shadow: 0 6px 18px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); position: relative; }
+        .food-card.disabled { opacity: 0.6; filter: grayscale(0.8); }
         .item-img-box { width: 95px; height: 95px; border-radius: 18px; overflow: hidden; background: #e5e5ea; flex-shrink: 0; }
         .item-img-box img { width: 100%; height: 100%; object-fit: cover; }
         .food-info { flex: 1; position: relative; display: flex; flex-direction: column; min-height: 95px; }
@@ -164,6 +174,11 @@
         .food-desc { font-size: 0.8rem; color: var(--desc-text); line-height: 1.4; margin-top: 4px; margin-bottom: 6px; }
         .food-price { font-weight: 900; color: var(--accent); font-size: 1.05rem; white-space: nowrap; }
         
+        .unavailable-badge {
+            background: var(--danger); color: white; padding: 4px 12px; border-radius: 10px;
+            font-size: 0.78rem; font-weight: 800; display: inline-block; margin-top: 6px;
+        }
+
         /* --- كروت قسم العروض (عرض الصورة بالكامل بشكل أنيق) --- */
         .offer-card {
             background: var(--white);
@@ -174,7 +189,9 @@
             border: 1px solid var(--border-subtle);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
+        .offer-card.disabled { opacity: 0.6; filter: grayscale(0.8); }
         .offer-img-box {
             width: 100%;
             height: auto;
@@ -276,7 +293,7 @@
         .ios-close { background: var(--accent); color: white; border: none; padding: 7px 22px; border-radius: 12px; cursor: pointer; font-weight: 800; }
 
         /* --- Footer --- */
-        .restaurant-footer { padding: 30px 20px; text-align: center; background: var(--white); border-top: 1px solid var(--border-subtle); margin-top: 25px; }
+        .restaurant-footer { padding: 30px 20px 40px 20px; text-align: center; background: var(--white); border-top: 1px solid var(--border-subtle); margin-top: 25px; }
         .footer-branches-container { text-align: center; max-width: 450px; margin: 0 auto 22px auto; background: var(--bg); padding: 18px; border-radius: 20px; border: 1px solid var(--border-subtle); }
         .footer-branch-title { font-weight: 900; font-size: 1rem; color: var(--accent); display: flex; align-items: center; justify-content: center; gap: 6px; }
         .footer-branch-addr { font-size: 0.88rem; color: var(--main-text); margin: 6px 0 12px 0; font-weight: 700; }
@@ -294,11 +311,119 @@
         .social-btn-link.wa-color { background: #25D366; }
         .social-btn-link svg { width: 24px; height: 24px; fill: white; }
 
-        .footer-rights { font-size: 0.8rem; color: var(--main-text); font-weight: 700; margin-bottom: 0; }
+        .footer-rights { font-size: 0.8rem; color: var(--main-text); font-weight: 700; margin-bottom: 15px; }
 
-        /* مودال السلة */
+        /* زر لوحة تحكم المطعم الكريتيف */
+        .admin-trigger-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, #2b1810, #422518);
+            color: #ff9800; padding: 10px 22px; border-radius: 20px;
+            font-weight: 800; font-size: 0.88rem; border: 1px solid rgba(255,152,0,0.3);
+            cursor: pointer; box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            transition: all 0.3s ease; margin-top: 10px;
+        }
+        .admin-trigger-btn:hover { transform: translateY(-2px); border-color: #ff9800; }
+
+        /* مودال كلمة السر الكريتيف */
+        .creative-pass-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 10, 8, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 3500; display: none; justify-content: center; align-items: center; padding: 20px;
+            animation: fadeInPass 0.3s ease forwards;
+        }
+        @keyframes fadeInPass { from { opacity: 0; } to { opacity: 1; } }
+        .creative-pass-card {
+            background: linear-gradient(145deg, #1e1410, #2b1810);
+            border: 1.5px solid rgba(249, 94, 7, 0.4);
+            border-radius: 28px; width: 100%; max-width: 380px;
+            padding: 30px 25px; text-align: center; color: #ffffff;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(249, 94, 7, 0.2);
+            position: relative; overflow: hidden;
+        }
+        .creative-pass-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,152,0,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .pass-icon-badge {
+            width: 70px; height: 70px; background: linear-gradient(135deg, var(--accent), var(--yellow-gold));
+            border-radius: 22px; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; margin: 0 auto 15px auto; box-shadow: 0 8px 20px var(--accent-glow);
+        }
+        .pass-title { font-weight: 900; font-size: 1.3rem; color: #ffffff; margin-bottom: 5px; }
+        .pass-sub { font-size: 0.83rem; color: #bdaaa2; margin-bottom: 22px; font-weight: 600; }
+        .pass-input-box {
+            position: relative; margin-bottom: 20px;
+        }
+        .pass-input-box input {
+            width: 100%; padding: 15px; border-radius: 16px; border: 2px solid rgba(249, 94, 7, 0.3);
+            background: rgba(0,0,0,0.4); color: #fff; font-size: 1.1rem; font-weight: 800;
+            text-align: center; outline: none; letter-spacing: 3px; transition: all 0.3s ease;
+        }
+        .pass-input-box input:focus {
+            border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); background: rgba(0,0,0,0.6);
+        }
+        .pass-btns-row { display: flex; gap: 10px; }
+        .pass-submit-btn {
+            flex: 2; background: linear-gradient(90deg, var(--accent), var(--yellow-gold));
+            color: #fff; border: none; padding: 13px; border-radius: 14px; font-weight: 900;
+            font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 15px var(--accent-glow);
+            transition: transform 0.2s ease;
+        }
+        .pass-submit-btn:active { transform: scale(0.96); }
+        .pass-cancel-btn {
+            flex: 1; background: rgba(255,255,255,0.08); color: #bdaaa2;
+            border: 1px solid rgba(255,255,255,0.15); padding: 13px; border-radius: 14px;
+            font-weight: 800; font-size: 0.9rem; cursor: pointer;
+        }
+
+        /* أزرار التحكم الفوري بإيقاف المنيو بالكامل */
+        .quick-menu-control-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;
+        }
+        .quick-control-btn {
+            padding: 12px 10px; border-radius: 16px; border: none; color: white;
+            font-weight: 900; font-size: 0.85rem; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transition: all 0.2s ease;
+        }
+        .quick-control-btn:active { transform: scale(0.96); }
+        .btn-disable-all { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .btn-enable-all { background: linear-gradient(135deg, #27ae60, #2ea043); }
+
+        /* مودال السلة والمودالات العامة */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 2000; display: none; justify-content: center; align-items: flex-end; }
         .modal-content { background: var(--white); width: 100%; max-width: 500px; padding: 25px; border-radius: 30px 30px 0 0; max-height: 90vh; overflow-y: auto; color: var(--main-text); }
+        
+        /* مودال لوحة تحكم المطعم */
+        .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2500; display: none; justify-content: center; align-items: center; padding: 15px; }
+        .admin-modal-content { background: var(--white); width: 100%; max-width: 520px; padding: 22px; border-radius: 26px; max-height: 90vh; overflow-y: auto; color: var(--main-text); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+        .admin-nav { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--border-subtle); padding-bottom: 10px; }
+        .admin-tab-btn { flex: 1; padding: 10px; border: none; background: var(--bg); border-radius: 12px; font-weight: 800; font-size: 0.82rem; color: var(--desc-text); cursor: pointer; transition: 0.3s; }
+        .admin-tab-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 10px var(--accent-glow); }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+
+        /* عناصر التحكم بالإدارة */
+        .toggle-switch { display: flex; align-items: center; justify-content: space-between; background: var(--bg); padding: 12px 16px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--border-subtle); }
+        .toggle-switch label { font-weight: 800; font-size: 0.9rem; }
+        .switch { position: relative; display: inline-block; width: 48px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .admin-item-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border-subtle); }
+        .admin-item-name { font-weight: 800; font-size: 0.88rem; }
+        
+        .order-history-card { background: var(--bg); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 14px; margin-bottom: 12px; font-size: 0.85rem; }
+        .order-history-header { display: flex; justify-content: space-between; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
+
+        .admin-input-group { margin-bottom: 12px; }
+        .admin-input-group label { display: block; font-size: 0.82rem; font-weight: 800; margin-bottom: 4px; color: var(--desc-text); }
+        .admin-input-group input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-subtle); background: var(--bg); font-weight: 700; color: var(--main-text); outline: none; }
+        
         .cart-item-card { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border-subtle); }
         .cart-item-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
         .cart-item-info { flex: 1; }
@@ -402,7 +527,30 @@
         </div>
 
         <p class="footer-rights">جميع الحقوق محفوظة لـ مطعم Dr. Broast 2026 ©</p>
+
+        <!-- زر لوحة تحكم المطعم الكريتيف -->
+        <button type="button" class="admin-trigger-btn" onclick="openCreativePassModal()">
+            👑 لوحة تحكم المطعم
+        </button>
     </footer>
+
+    <!-- نافذة إدخال كلمة السر الإبداعية الكريتيف -->
+    <div class="creative-pass-modal" id="creativePassModal">
+        <div class="creative-pass-card">
+            <div class="pass-icon-badge">🔐</div>
+            <h3 class="pass-title">لوحة تحكم المطعم</h3>
+            <p class="pass-sub">أدخل كلمة المرور الخاصة بالإدارة للمتابعة</p>
+            
+            <div class="pass-input-box">
+                <input type="password" id="creativePassInput" placeholder="••••" maxlength="20" onkeyup="if(event.key==='Enter') verifyAdminPass()">
+            </div>
+            
+            <div class="pass-btns-row">
+                <button type="button" class="pass-submit-btn" onclick="verifyAdminPass()">دخول اللوحة</button>
+                <button type="button" class="pass-cancel-btn" onclick="closeCreativePassModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
 
     <!-- نافذة السلة -->
     <div class="modal" id="cartModal" onclick="if(event.target==this) toggleCart(false)">
@@ -463,6 +611,73 @@
         </div>
     </div>
 
+    <!-- نافذة لوحة تحكم المطعم (لوحة الإدارة) -->
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="font-weight: 900; color: var(--accent);">👑 لوحة تحكم المطعم</h3>
+                <span onclick="closeAdminPanel()" style="cursor: pointer; font-weight: 900; font-size: 1.2rem;">✕</span>
+            </div>
+
+            <!-- أزرار الإغلاق والتشغيل المباشر للمنيو بالكامل -->
+            <div class="quick-menu-control-grid">
+                <button type="button" class="quick-control-btn btn-disable-all" onclick="setFullMenuState(true)">
+                    🛑 إغلاق المنيو بالكامل
+                </button>
+                <button type="button" class="quick-control-btn btn-enable-all" onclick="setFullMenuState(false)">
+                    ✅ تشغيل المنيو بالكامل
+                </button>
+            </div>
+
+            <!-- تبويبات لوحة التحكم -->
+            <div class="admin-nav">
+                <button class="admin-tab-btn active" onclick="switchAdminTab('menuControl', this)">🍔 المنيو</button>
+                <button class="admin-tab-btn" onclick="switchAdminTab('orderHistory', this)">📋 سجل الطلبات</button>
+                <button class="admin-tab-btn" onclick="switchAdminTab('changePass', this)">🔒 كلمة المرور</button>
+            </div>
+
+            <!-- 1. قسم التحكم بالمنيو -->
+            <div id="adminTabMenuControl" class="admin-section active">
+                <div class="toggle-switch" style="background: var(--accent-light); border-color: var(--accent);">
+                    <label style="color: var(--accent);">🔴 حالة المنيو حالياً (معطل بالكامل)</label>
+                    <label class="switch">
+                        <input type="checkbox" id="disableAllMenuToggle" onchange="toggleDisableAllMenu(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <h4 style="margin: 15px 0 10px 0; font-weight: 800; font-size: 0.9rem;">التحكم بالأصناف فرديًا:</h4>
+                <div id="adminItemsList" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- 2. قسم سجل الطلبات -->
+            <div id="adminTabOrderHistory" class="admin-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="font-weight: 800; font-size: 0.9rem;">سجل الطلبات الواردة:</h4>
+                    <button onclick="clearOrderHistory()" style="background: var(--danger); color: white; border: none; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; cursor: pointer;">مسح السجل</button>
+                </div>
+                <div id="adminOrdersList" style="max-height: 350px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- 3. قسم تغيير كلمة المرور -->
+            <div id="adminTabChangePass" class="admin-section">
+                <div class="admin-input-group">
+                    <label>كلمة المرور الحالية:</label>
+                    <input type="password" id="currPassInput" placeholder="أدخل كلمة المرور الحالية">
+                </div>
+                <div class="admin-input-group">
+                    <label>كلمة المرور الجديدة:</label>
+                    <input type="password" id="newPassInput" placeholder="أدخل كلمة المرور الجديدة">
+                </div>
+                <div class="admin-input-group">
+                    <label>تأكيد كلمة المرور الجديدة:</label>
+                    <input type="password" id="confirmPassInput" placeholder="تأكيد كلمة المرور الجديدة">
+                </div>
+                <button class="submit-btn" onclick="saveNewPassword()" style="margin-top: 10px;">حفظ كلمة المرور</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQYAaXvqYs8Mg1uAiFsjL5l0WMx6ttAhWmbIakcuGzzGtzHw0DDGEBEOFSn0h3z8kaikRFJQ1Mt9wJo/pub?output=csv';
         const IMAGES_PATH = "./images/"; 
@@ -476,6 +691,15 @@
         let deferredPrompt;
         let selectedOrderType = 'delivery';
         let selectedPaymentMethod = 'cash';
+        let currentCat = '';
+
+        /* نظام حالة لوحة تحكم المطعم */
+        let adminConfig = {
+            password: localStorage.getItem('dr_admin_pass') || '1234',
+            isMenuDisabled: localStorage.getItem('dr_menu_disabled') === 'true',
+            disabledItems: JSON.parse(localStorage.getItem('dr_disabled_items') || '[]'),
+            ordersHistory: JSON.parse(localStorage.getItem('dr_orders_history') || '[]')
+        };
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -619,8 +843,19 @@
         }
 
         function filterCat(cat, el) {
+            currentCat = cat;
             if(el) { document.querySelectorAll('.cat-item').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
             
+            /* التثبت من حالة المنيو بالكامل */
+            if (adminConfig.isMenuDisabled) {
+                document.getElementById('menuList').innerHTML = `
+                    <div class="menu-disabled-alert">
+                        🛑 المطعم مغلق حاليًا أو تم إيقاف استقبال الطلبات عبر المنيو الإلكتروني.
+                    </div>
+                `;
+                return;
+            }
+
             const isOffers = isOffersCategory(cat);
             const isChickenBurger = isChickenBurgerCategory(cat);
             const isBeefBurger = isBeefBurgerCategory(cat);
@@ -631,6 +866,7 @@
                 const priceInfo = parsePriceData(item.rawPrice);
                 const isRizo = isRizoCategory(item.category, item.name);
                 const isBroastOrStrips = isBroastOrStripsCategory(item.category);
+                const isItemDisabled = adminConfig.disabledItems.includes(item.name);
 
                 let showAddon = false;
                 let addonLabel = 'إضافة قطعة برجر';
@@ -652,7 +888,7 @@
                 /* تصميم كارت قسم العروض (عرض الصورة بالكامل بدون اقتطاع) */
                 if (isOffers) {
                     return `
-                    <div class="offer-card" data-category="${item.category}" data-raw-price="${item.rawPrice}" data-base-price="${priceInfo.numericValue}" data-price="${priceInfo.numericValue}" data-is-percent="${priceInfo.isPercent}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
+                    <div class="offer-card ${isItemDisabled ? 'disabled' : ''}" data-category="${item.category}" data-raw-price="${item.rawPrice}" data-base-price="${priceInfo.numericValue}" data-price="${priceInfo.numericValue}" data-is-percent="${priceInfo.isPercent}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
                         <div class="offer-img-box">
                             <img src="${item.img}" onerror="this.src='${IMAGES_PATH}default.jpg'">
                             <span class="offer-badge-tag">🔥 عرض خاص</span>
@@ -663,8 +899,9 @@
                                 <span class="food-price">${priceInfo.displayPrice}</span>
                             </div>
                             ${item.desc ? `<p class="food-desc">${item.desc}</p>` : ''}
+                            ${isItemDisabled ? `<span class="unavailable-badge">غير متاح حاليًا ⚠️</span>` : ''}
 
-                            ${showAddon ? `
+                            ${showAddon && !isItemDisabled ? `
                             <div class="addon-box" onclick="toggleAddonBox(this)">
                                 <div class="addon-content">
                                     <div class="addon-custom-check">✓</div>
@@ -674,6 +911,7 @@
                             </div>
                             ` : ''}
 
+                            ${!isItemDisabled ? `
                             <div class="action-row" style="margin-top: 10px;">
                                 <div class="qty-picker">
                                     <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
@@ -682,13 +920,14 @@
                                 </div>
                                 <button class="order-btn" onclick="addToCart(event, this, '${item.name}', '${item.img}')">اطلب العرض</button>
                             </div>
+                            ` : ''}
                         </div>
                     </div>`;
                 }
 
                 /* كروت باقي الأقسام العادية */
                 return `
-                <div class="food-card" data-category="${item.category}" data-raw-price="${item.rawPrice}" data-base-price="${priceInfo.numericValue}" data-price="${priceInfo.numericValue}" data-is-percent="${priceInfo.isPercent}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
+                <div class="food-card ${isItemDisabled ? 'disabled' : ''}" data-category="${item.category}" data-raw-price="${item.rawPrice}" data-base-price="${priceInfo.numericValue}" data-price="${priceInfo.numericValue}" data-is-percent="${priceInfo.isPercent}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
                     <div class="item-img-box"><img src="${item.img}" onerror="this.src='${IMAGES_PATH}default.jpg'"></div>
                     <div class="food-info">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
@@ -696,8 +935,9 @@
                             <span class="food-price">${priceInfo.displayPrice}</span>
                         </div>
                         ${item.desc ? `<p class="food-desc">${item.desc}</p>` : ''}
+                        ${isItemDisabled ? `<div><span class="unavailable-badge">غير متاح حاليًا ⚠️</span></div>` : ''}
                         
-                        ${showAddon ? `
+                        ${showAddon && !isItemDisabled ? `
                         <div class="addon-box" onclick="toggleAddonBox(this)">
                             <div class="addon-content">
                                 <div class="addon-custom-check">✓</div>
@@ -707,7 +947,7 @@
                         </div>
                         ` : ''}
 
-                        ${isRizo ? `
+                        ${isRizo && !isItemDisabled ? `
                         <div class="sauce-section">
                             <span class="sauce-title">🥣 الصوص:</span>
                             <button type="button" class="sauce-btn" onclick="selectSauce(this, 'رانش')">رانش</button>
@@ -718,7 +958,7 @@
                         </div>
                         ` : ''}
 
-                        ${isBroastOrStrips ? `
+                        ${isBroastOrStrips && !isItemDisabled ? `
                         <div class="sauce-section">
                             <span class="sauce-title">🌶️ النوع:</span>
                             <button type="button" class="sauce-btn" onclick="selectFlavor(this, 'عادي')">عادي</button>
@@ -726,6 +966,7 @@
                         </div>
                         ` : ''}
 
+                        ${!isItemDisabled ? `
                         <div class="action-row">
                             <div class="qty-picker">
                                 <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
@@ -734,6 +975,7 @@
                             </div>
                             <button class="order-btn" onclick="addToCart(event, this, '${item.name}', '${item.img}')">اطلب</button>
                         </div>
+                        ` : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -996,7 +1238,7 @@
         function fallbackCopy(text, btn) {
             const textArea = document.createElement('textarea');
             textArea.value = text;
-            textArea.style.position = 'fixed';
+            textArea.style.style.position = 'fixed';
             textArea.style.opacity = '0';
             document.body.appendChild(textArea);
             textArea.select();
@@ -1006,6 +1248,62 @@
                 setTimeout(() => { btn.innerText = '📋 نسخ'; }, 2000);
             } catch (err) {}
             document.body.removeChild(textArea);
+        }
+
+        /* ------------------------------------------------------------- */
+        /* --- نظام التنبيه الصوتي القوي الملحوظ لمدة ثانيتين بالظبط --- */
+        /* ------------------------------------------------------------- */
+        function triggerOrderLoudAlert() {
+            try {
+                /* 1. تشغيل تنبيه صوتي قوي ثنائي النغمة لمدة 2 ثانية */
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    const audioCtx = new AudioContext();
+                    const osc1 = audioCtx.createOscillator();
+                    const osc2 = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+
+                    osc1.type = 'sawtooth';
+                    osc2.type = 'square';
+
+                    osc1.frequency.setValueAtTime(880, audioCtx.currentTime); // نغمة مرتفعة (A5)
+                    osc2.frequency.setValueAtTime(440, audioCtx.currentTime); // نغمة عميقة (A4)
+
+                    // تدرج التنبيه القوي
+                    osc1.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.5);
+                    osc1.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 1.0);
+                    osc1.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 1.5);
+
+                    gainNode.gain.setValueAtTime(0.8, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 2.0);
+
+                    osc1.connect(gainNode);
+                    osc2.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+
+                    osc1.start();
+                    osc2.start();
+                    osc1.stop(audioCtx.currentTime + 2.0);
+                    osc2.stop(audioCtx.currentTime + 2.0);
+                }
+
+                /* 2. اهتزاز الجهاز إضافي لتأكيد التنبيه */
+                if ("vibrate" in navigator) {
+                    navigator.vibrate([500, 200, 500, 200, 600]);
+                }
+
+                /* 3. إرسال إشعارات النظام حتى لو الشاشة مقفولة والجوال في الجيب */
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("🚨 طلب جديد وصل من مطعم Dr. Broast!", {
+                        body: "هناك طلب جديد بحاجة للمراجعة الآن!",
+                        icon: "images/logotempo.png",
+                        vibrate: [500, 200, 500, 200, 600],
+                        requireInteraction: true
+                    });
+                }
+            } catch (err) {
+                console.log('Order Sound Alert Triggered', err);
+            }
         }
 
         function sendToWA() {
@@ -1052,7 +1350,173 @@
             msg += `💰 *الإجمالي الكلي النقدي:* *${currentTotal} ج.م*\n\n`;
             msg += `شكراً لاختياركم Dr. Broast! ✨`;
 
+            /* حفظ الطلب في سجل الطلبات لوحة الإدارة */
+            const orderRecord = {
+                id: Date.now(),
+                date: new Date().toLocaleString('ar-EG'),
+                name: n,
+                phone: p,
+                type: typeLabel,
+                total: currentTotal,
+                details: [...cart]
+            };
+            adminConfig.ordersHistory.unshift(orderRecord);
+            localStorage.setItem('dr_orders_history', JSON.stringify(adminConfig.ordersHistory));
+
+            /* إطلاق التنبيه الصوتي القوي الملحوظ بدقة عند طلب أي زبون للأوردر */
+            triggerOrderLoudAlert();
+
             window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
+        }
+
+        /* ------------------------------------------------------------- */
+        /* --- وظائف لوحة تحكم المطعم (إدارة المطعم) --- */
+        /* ------------------------------------------------------------- */
+
+        function openCreativePassModal() {
+            document.getElementById('creativePassModal').style.display = 'flex';
+            document.getElementById('creativePassInput').value = '';
+            document.getElementById('creativePassInput').focus();
+        }
+
+        function closeCreativePassModal() {
+            document.getElementById('creativePassModal').style.display = 'none';
+        }
+
+        function verifyAdminPass() {
+            const enteredPass = document.getElementById('creativePassInput').value.trim();
+            if (!enteredPass) {
+                alert("❌ يرجى إدخال كلمة المرور أولاً!");
+                return;
+            }
+
+            if (enteredPass === adminConfig.password) {
+                closeCreativePassModal();
+                openAdminPanel();
+            } else {
+                alert("❌ كلمة المرور غير صحيحة!");
+            }
+        }
+
+        function openAdminPanel() {
+            // طلب إذن الإشعارات عند فتح اللوحة لضمان عمل التنبيه والصوت والدعم الكامل
+            if ("Notification" in window && Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+
+            document.getElementById('adminModal').style.display = 'flex';
+            document.getElementById('disableAllMenuToggle').checked = adminConfig.isMenuDisabled;
+            renderAdminItemsList();
+            renderAdminOrdersList();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function switchAdminTab(tabName, btn) {
+            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            
+            btn.classList.add('active');
+            if (tabName === 'menuControl') document.getElementById('adminTabMenuControl').classList.add('active');
+            if (tabName === 'orderHistory') document.getElementById('adminTabOrderHistory').classList.add('active');
+            if (tabName === 'changePass') document.getElementById('adminTabChangePass').classList.add('active');
+        }
+
+        /* تحكم مباشر بزرين إغلاق وتشغيل المنيو بالكامل */
+        function setFullMenuState(isDisabled) {
+            adminConfig.isMenuDisabled = isDisabled;
+            localStorage.setItem('dr_menu_disabled', isDisabled);
+            document.getElementById('disableAllMenuToggle').checked = isDisabled;
+            filterCat(currentCat);
+            alert(isDisabled ? "🛑 تم إغلاق المنيو بالكامل بنجاح" : "✅ تم تشغيل المنيو بالكامل بنجاح");
+        }
+
+        function toggleDisableAllMenu(disabled) {
+            adminConfig.isMenuDisabled = disabled;
+            localStorage.setItem('dr_menu_disabled', disabled);
+            filterCat(currentCat);
+        }
+
+        function renderAdminItemsList() {
+            const container = document.getElementById('adminItemsList');
+            container.innerHTML = menuData.map(item => {
+                const isDisabled = adminConfig.disabledItems.includes(item.name);
+                return `
+                <div class="admin-item-row">
+                    <span class="admin-item-name">${item.name} (${item.category})</span>
+                    <label class="switch">
+                        <input type="checkbox" ${!isDisabled ? 'checked' : ''} onchange="toggleItemStatus('${item.name}', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleItemStatus(itemName, isAvailable) {
+            if (!isAvailable) {
+                if (!adminConfig.disabledItems.includes(itemName)) {
+                    adminConfig.disabledItems.push(itemName);
+                }
+            } else {
+                adminConfig.disabledItems = adminConfig.disabledItems.filter(i => i !== itemName);
+            }
+            localStorage.setItem('dr_disabled_items', JSON.stringify(adminConfig.disabledItems));
+            filterCat(currentCat);
+        }
+
+        function renderAdminOrdersList() {
+            const container = document.getElementById('adminOrdersList');
+            if (adminConfig.ordersHistory.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--desc-text); padding:15px;">لا يوجد طلبات مسجلة بعد</p>';
+                return;
+            }
+
+            container.innerHTML = adminConfig.ordersHistory.map(ord => `
+                <div class="order-history-card">
+                    <div class="order-history-header">
+                        <span>👤 ${ord.name} (${ord.phone})</span>
+                        <span>${ord.total} ج.م</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--desc-text); margin-bottom:5px;">🕒 ${ord.date} | ${ord.type}</div>
+                    <ul style="padding-right:15px; margin-top:5px;">
+                        ${ord.details.map(d => `<li>${d.name} × ${d.qty}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        function clearOrderHistory() {
+            if (confirm("هل أنت تأكد من مسح جميع سجلات الطلبات؟")) {
+                adminConfig.ordersHistory = [];
+                localStorage.setItem('dr_orders_history', JSON.stringify([]));
+                renderAdminOrdersList();
+            }
+        }
+
+        function saveNewPassword() {
+            const curr = document.getElementById('currPassInput').value.trim();
+            const newP = document.getElementById('newPassInput').value.trim();
+            const confP = document.getElementById('confirmPassInput').value.trim();
+
+            if (curr !== adminConfig.password) {
+                return alert("❌ كلمة المرور الحالية غير صحيحة!");
+            }
+            if (!newP) {
+                return alert("❌ يرجى إدخال كلمة المرور الجديدة!");
+            }
+            if (newP !== confP) {
+                return alert("❌ كلمة المرور الجديدة وتأكيدها غير متطابقين!");
+            }
+
+            adminConfig.password = newP;
+            localStorage.setItem('dr_admin_pass', newP);
+            alert("✓ تم تغيير كلمة المرور بنجاح!");
+            
+            document.getElementById('currPassInput').value = '';
+            document.getElementById('newPassInput').value = '';
+            document.getElementById('confirmPassInput').value = '';
         }
 
         function initPWA() {
