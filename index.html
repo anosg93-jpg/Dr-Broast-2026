@@ -502,7 +502,7 @@
             if (!isInitialLoad && data) {
                 if (window.isDeviceOwner && window.isDeviceOwner()) {
                     window.playBellNotification();
-                    // عرض إشعار النظام الفوري المكتوب
+                    // إشعار النظام المكتوب بالتنسيق المطلوب بالضبط
                     window.showPushNotification("أوردر جديد - Dr. Broast 🍗", "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!");
                 }
             }
@@ -570,7 +570,7 @@
            ======================================================== */
         function playBellSoundOnce(audioCtx) {
             const now = audioCtx.currentTime;
-            [1046.5, 2093.0].forEach(freq => { // تردد نغمة جرس واضحة وقوية جداً (C6)
+            [1046.5, 2093.0].forEach(freq => { 
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'triangle';
@@ -590,7 +590,6 @@
                 if (!AudioContext) return;
                 const ctx = new AudioContext();
 
-                // تكرار الرنة مرتين بإجمالي مدة ثانيتين تماماً
                 playBellSoundOnce(ctx);
                 setTimeout(() => playBellSoundOnce(ctx), 1000);
             } catch (e) {
@@ -610,7 +609,6 @@
             const ownerBar = document.getElementById('ownerBar');
             if (window.isDeviceOwner()) {
                 ownerBar.style.display = 'flex';
-                // طلب صلاحية الإشعارات تلقائياً عند تفعيل وضع صاحب المطعم
                 if ("Notification" in window && Notification.permission !== "granted") {
                     Notification.requestPermission();
                 }
