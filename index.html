@@ -164,7 +164,7 @@
         .food-desc { font-size: 0.8rem; color: var(--desc-text); line-height: 1.4; margin-top: 4px; margin-bottom: 6px; }
         .food-price { font-weight: 900; color: var(--accent); font-size: 1.05rem; white-space: nowrap; }
         
-        /* --- كروت قسم العروض (تصميم رأسي كبير) --- */
+        /* --- كروت قسم العروض (عرض الصورة بالكامل بشكل أنيق) --- */
         .offer-card {
             background: var(--white);
             border-radius: 24px;
@@ -177,15 +177,22 @@
         }
         .offer-img-box {
             width: 100%;
-            height: 190px;
-            background: #e5e5ea;
+            height: auto;
+            max-height: 320px;
+            background: var(--bg);
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--border-subtle);
         }
         .offer-img-box img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
+            max-height: 320px;
+            object-fit: contain;
+            display: block;
         }
         .offer-badge-tag {
             position: absolute;
@@ -198,6 +205,7 @@
             padding: 4px 12px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 2;
         }
         .offer-info {
             padding: 16px;
@@ -316,7 +324,7 @@
         <div class="loader-content">
             <img src="images/logotempo.png" class="loader-logo-big" onerror="this.src='images/default.jpg'">
             <h2 class="loader-text">Dr. Broast</h2>
-            <p class="loader-slogan">طعم اصلي ..... مذاج رايق 🍗🔥</p>
+            <p class="loader-slogan">طعم اصلي ..... مزاج رايق 🍗🔥</p>
             <div class="loading-bar"><span></span></div>
             <div class="creative-counter">جاري تحضير القائمة... <span id="loadPercentage">0</span>%</div>
         </div>
@@ -543,7 +551,6 @@
             return c.includes('بروست') || c.includes('استربس') || c.includes('ستربس') || c.includes('الفرخه الكامله') || c.includes('الفرخة الكاملة') || c.includes('فرخة كاملة') || c.includes('فرخه كامله');
         }
 
-        // دالة المساعدة للتحقق إذا كان السعر عبارة عن نسبة مئوية أم مبلغ
         function parsePriceData(rawPriceStr) {
             const str = String(rawPriceStr || '').trim();
             const isPercent = str.includes('%') || str.includes('خصم');
@@ -642,7 +649,7 @@
                     }
                 }
 
-                /* تصميم كارت قسم العروض الرأسي */
+                /* تصميم كارت قسم العروض (عرض الصورة بالكامل بدون اقتطاع) */
                 if (isOffers) {
                     return `
                     <div class="offer-card" data-category="${item.category}" data-raw-price="${item.rawPrice}" data-base-price="${priceInfo.numericValue}" data-price="${priceInfo.numericValue}" data-is-percent="${priceInfo.isPercent}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
