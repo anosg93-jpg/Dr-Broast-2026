@@ -15,7 +15,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDKs v8 المباشرة -->
+    <!-- Firebase SDKs v8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -47,7 +47,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
         body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 70px; }
 
-        /* الحاوية المركزية للوجو والشارة فوقه */
+        /* الحاوية المركزية للوجو والأيقونة فوقه */
         .logo-center-wrapper {
             display: flex;
             flex-direction: column;
@@ -262,14 +262,13 @@
         .login-card-box input:focus, .pass-card-box input:focus { border-color: #d85000; }
         .login-btn, .pass-save-btn { width: 100%; background: linear-gradient(90deg, #d85000, #f95e07); color: white; border: none; padding: 13px; border-radius: 14px; font-weight: 900; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 12px rgba(216, 80, 0, 0.25); }
 
+        /* سجل الطلبات */
         .order-log-card { background: white; padding: 16px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #eaecf0; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .order-log-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eaecf0; padding-bottom: 8px; margin-bottom: 10px; }
         .order-log-name { font-weight: 900; font-size: 0.95rem; color: #1d2939; }
         .order-log-price { font-weight: 900; color: #d85000; font-size: 1rem; background: #fff2ea; padding: 2px 10px; border-radius: 10px; }
         .order-log-info { font-size: 0.83rem; color: #344054; font-weight: 700; margin-bottom: 5px; display: flex; align-items: flex-start; gap: 6px; }
         .order-items-box { background: #f8f9fa; padding: 10px; border-radius: 12px; margin-top: 8px; font-size: 0.8rem; color: #475467; border: 1px solid #f2f4f7; }
-        .order-item-line { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dashed #e4e7ec; }
-        .order-item-line:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -391,7 +390,7 @@
                 <input type="tel" id="uPhone" placeholder="رقم الموبايل">
                 <input type="text" id="uAddr" placeholder="العنوان بالتفصيل">
             </div>
-            <button class="submit-btn" onclick="sendToWA()">تأكيد الطلب عبر واتساب</button>
+            <button class="submit-btn" id="submitOrderBtn" onclick="sendToWA()">تأكيد الطلب عبر واتساب</button>
         </div>
     </div>
 
@@ -430,7 +429,6 @@
             </div>
 
             <div id="tabStatusContent" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-                <!-- زر اختبار الإشعار الفوري للتأكد على جهازك -->
                 <button onclick="testNotificationDirectly()" style="background: #1877F2; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-bottom: 10px;">🔔 اضغط هنا لاختبار الإشعار في هاتفك الآن</button>
 
                 <div class="admin-bulk-actions">
@@ -489,7 +487,7 @@
             if (menuData.length > 0) renderNav();
         });
 
-        // استماع فوري للطلبات الجديدة
+        // الاستماع الفوري لكل طلب جديد وتسجيله وتنبيه صاحب المطعم
         db.ref('orders').limitToLast(1).on('child_added', snap => {
             if (isFirstOrdersLoad) {
                 isFirstOrdersLoad = false;
@@ -514,7 +512,7 @@
         let selectedPaymentMethod = 'cash';
         let currentActiveCategory = "";
 
-        // دالة إرسال الإشعار لستارة الأندرويد
+        // دالة إرسال الإشعار لستارة الهاتف وشاشة القفل
         function triggerLoudAlarmAndNotification() {
             const titleText = "أوردر جديد - Dr. Broast 🍗";
             const bodyText = "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!";
@@ -550,7 +548,6 @@
             playBellNotification();
         }
 
-        // زر التجربة المباشر للإشعار
         function testNotificationDirectly() {
             if ("Notification" in window) {
                 Notification.requestPermission().then(perm => {
@@ -1016,6 +1013,7 @@
             setTimeout(() => { document.getElementById('copyBtn').innerText = '📋 نسخ'; }, 2000);
         }
 
+        // إرسال الطلب وحفظه مباشرة في Firebase والسجل
         function sendToWA() {
             const n = document.getElementById('uName').value.trim();
             const p = document.getElementById('uPhone').value.trim();
@@ -1023,6 +1021,10 @@
             
             if (!n || !p || cart.length === 0) return alert("يرجى إدخال الاسم ورقم الموبايل واختيار الأصناف أولاً");
             if (selectedOrderType === 'delivery' && !a) return alert("يرجى إدخال عنوان التوصيل بالتفصيل");
+
+            const submitBtn = document.getElementById('submitOrderBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "جاري تأكيد الطلب...";
 
             let typeLabel = '🛵 دليفري';
             if (selectedOrderType === 'dineIn') typeLabel = '🍽️ صالة';
@@ -1034,7 +1036,7 @@
 
             const itemsDetails = cart.map((i, index) => `${index + 1}. ${i.name} [العدد: ${i.qty}] - ${i.isPercent ? i.rawPrice : (i.price * i.qty) + ' ج.م'}`).join('\n');
 
-            db.ref('orders').push({
+            const orderData = {
                 name: n,
                 phone: p,
                 address: selectedOrderType === 'delivery' ? a : '',
@@ -1043,14 +1045,28 @@
                 details: itemsDetails,
                 total: currentTotal,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-            
-            let msg = `✨ *طلب جديد من مطعم Dr. Broast* ✨\n\n👤 *الاسم:* ${n}\n📱 *الهاتف:* ${p}\n📋 *نوع الطلب:* ${typeLabel}\n💳 *طريقة الدفع:* ${payLabel}\n`;
-            if (selectedOrderType === 'delivery') msg += `📍 *العنوان:* ${a}\n`;
-            msg += `\n🛒 *تفاصيل الطلب:* \n---------------------------------\n${itemsDetails}\n---------------------------------\n\n`;
-            msg += `💰 *الإجمالي الكلي:* *${currentTotal} ج.م*\n\nشكراً لاختياركم Dr. Broast! ✨`;
+            };
 
-            window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
+            // الحفظ في قاعدة البيانات فورياً
+            db.ref('orders').push(orderData).then(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "تأكيد الطلب عبر واتساب";
+                
+                let msg = `✨ *طلب جديد من مطعم Dr. Broast* ✨\n\n👤 *الاسم:* ${n}\n📱 *الهاتف:* ${p}\n📋 *نوع الطلب:* ${typeLabel}\n💳 *طريقة الدفع:* ${payLabel}\n`;
+                if (selectedOrderType === 'delivery') msg += `📍 *العنوان:* ${a}\n`;
+                msg += `\n🛒 *تفاصيل الطلب:* \n---------------------------------\n${itemsDetails}\n---------------------------------\n\n`;
+                msg += `💰 *الإجمالي الكلي:* *${currentTotal} ج.م*\n\nشكراً لاختياركم Dr. Broast! ✨`;
+
+                cart = [];
+                updateCart();
+                toggleCart(false);
+
+                window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
+            }).catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "تأكيد الطلب عبر واتساب";
+                alert("حدث خطأ أثناء حفظ الطلب، يرجى المحاولة مرة أخرى.");
+            });
         }
 
         /* --- لوحة تحكم صاحب المطعم --- */
@@ -1093,11 +1109,7 @@
                 localStorage.setItem('admin_login_count', '1');
                 
                 if ("Notification" in window) {
-                    Notification.requestPermission().then(perm => {
-                        if (perm === 'granted') {
-                            triggerLoudAlarmAndNotification();
-                        }
-                    });
+                    Notification.requestPermission();
                 }
 
                 closeLoginModal();
@@ -1189,10 +1201,13 @@
             });
         }
 
+        // عرض وتحميل سجل الطلبات كاملاً بدون فقدان أي طلب
         function listenToOrdersLog() {
-            db.ref('orders').limitToLast(20).on('value', snap => {
+            const container = document.getElementById('adminOrdersList');
+            container.innerHTML = '<div style="text-align:center; padding: 20px; font-weight:800; color:#667085;">جاري تحميل سجل الطلبات...</div>';
+
+            db.ref('orders').on('value', snap => {
                 const orders = snap.val();
-                const container = document.getElementById('adminOrdersList');
                 if(!orders) {
                     container.innerHTML = '<div style="text-align:center; padding: 40px; font-weight:800; color:#667085;">لا توجد طلبات مسجلة حالياً</div>';
                     return;
