@@ -46,7 +46,7 @@
             background: linear-gradient(90deg, #d85000, #ff9800);
             color: #ffffff;
             text-align: center;
-            padding: 6px 12px;
+            padding: 8px 12px;
             font-size: 0.85rem;
             font-weight: 900;
             display: none;
@@ -54,6 +54,7 @@
             justify-content: center;
             gap: 8px;
             box-shadow: 0 2px 10px rgba(216, 80, 0, 0.3);
+            cursor: pointer;
         }
 
         /* --- شاشة الترحيب --- */
@@ -257,9 +258,9 @@
 </head>
 <body>
 
-    <!-- شريط صاحب المطعم العلوي -->
-    <div id="ownerBar" class="owner-top-bar">
-        <span>👑 وضع صاحب المطعم نشط (يتم استقبال التنبيهات الصوتية للطلبات)</span>
+    <!-- شريط صاحب المطعم العلوي مع تفعيل الإشعارات بالضغط -->
+    <div id="ownerBar" class="owner-top-bar" onclick="requestNotificationPermission()">
+        <span>👑 وضع صاحب المطعم نشط (اضغط هنا لتفعيل إشعارات الرسائل الفورية)</span>
     </div>
 
     <!-- شاشة البداية -->
@@ -456,7 +457,6 @@
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // المزامنة والسحابة لكلمة المرور ورمز الأمان
         window.getGlobalPassToken = async function() {
             try {
                 const snapshot = await get(ref(database, 'system_config/pass_token'));
@@ -472,7 +472,6 @@
             });
         };
 
-        // متابعة التغييرات في الباسورد لعزل باقي أصحاب المطاعم إذا حُدثت
         const configRef = ref(database, 'system_config');
         onValue(configRef, (snapshot) => {
             const data = snapshot.val();
@@ -480,10 +479,8 @@
                 window.serverPass = data.pass || '1234';
                 window.serverToken = data.pass_token;
                 
-                // تحقق هل كلمة السر اتغيرت والرمز اتغير؟
                 const myToken = localStorage.getItem('dr_owner_token');
                 if (myToken && myToken !== data.pass_token) {
-                    // تم استثناء هذا الجهاز لأنه لا يملك الباسورد الجديد
                     localStorage.removeItem('dr_owner_token');
                     localStorage.removeItem('dr_login_counter');
                     if (window.checkOwnerBadge) window.checkOwnerBadge();
@@ -496,7 +493,6 @@
             return push(ordersRef, orderData);
         };
 
-        // المتابعة اللحظية لسجل الطلبات مع تشغيل الجرس لصاحب المطعم فقط
         let isInitialLoad = true;
         const ordersRef = ref(database, 'orders');
         onValue(ordersRef, (snapshot) => {
@@ -504,9 +500,10 @@
             window.realtimeOrders = data ? Object.values(data).reverse() : [];
             
             if (!isInitialLoad && data) {
-                // حدث طلب جديد
                 if (window.isDeviceOwner && window.isDeviceOwner()) {
                     window.playBellNotification();
+                    // عرض إشعار النظام الفوري المكتوب
+                    window.showPushNotification("أوردر جديد - Dr. Broast 🍗", "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!");
                 }
             }
             isInitialLoad = false;
@@ -529,26 +526,61 @@
         let selectedPaymentMethod = 'cash';
         let currentActiveCategory = "";
 
-        // تخزين الأغذية الموقوفة محلياً
         let disabledItems = JSON.parse(localStorage.getItem('dr_disabled_items') || '[]');
 
+        /* --- تفعيل إشعارات المتصفح (Web Notifications) --- */
+        window.requestNotificationPermission = function() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        alert("✅ تم تفعيل الإشعارات النصية بنجاح! ستظهر لك رسائل الأوردرات حتى لو الشاشة مقفولة.");
+                    } else {
+                        alert("⚠️ يرجى السماح بالإشعارات من إعدادات المتصفح لضمان وصول رسائل الأوردرات.");
+                    }
+                });
+            }
+        };
+
+        window.showPushNotification = function(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                try {
+                    const options = {
+                        body: body,
+                        icon: "images/logotempo.png",
+                        badge: "images/logotempo.png",
+                        vibrate: [200, 100, 200],
+                        tag: "new-order",
+                        renotify: true
+                    };
+                    if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+                        navigator.serviceWorker.ready.then(registration => {
+                            registration.showNotification(title, options);
+                        });
+                    } else {
+                        new Notification(title, options);
+                    }
+                } catch(e) {
+                    console.log("Notification error:", e);
+                }
+            }
+        };
+
         /* ========================================================
-           --- التنبيه الصوتي (جرس قوي يتكرر لمدة ثانيتين) ---
+           --- التنبيه الصوتي (جرس قوي واضح لمدة ثانيتين) ---
            ======================================================== */
         function playBellSoundOnce(audioCtx) {
             const now = audioCtx.currentTime;
-            // نغمتين متناغمتين محاكاة للجرس القوي
-            [880, 1760].forEach(freq => {
+            [1046.5, 2093.0].forEach(freq => { // تردد نغمة جرس واضحة وقوية جداً (C6)
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                osc.type = 'sine';
+                osc.type = 'triangle';
                 osc.frequency.setValueAtTime(freq, now);
-                gain.gain.setValueAtTime(0.6, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                gain.gain.setValueAtTime(0.8, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start(now);
-                osc.stop(now + 0.8);
+                osc.stop(now + 1.0);
             });
         }
 
@@ -558,9 +590,9 @@
                 if (!AudioContext) return;
                 const ctx = new AudioContext();
 
-                // التكرار لمدة 2 ثانية فقط (رنة عند 0 ثانية ورنة عند 0.8 ثانية)
+                // تكرار الرنة مرتين بإجمالي مدة ثانيتين تماماً
                 playBellSoundOnce(ctx);
-                setTimeout(() => playBellSoundOnce(ctx), 800);
+                setTimeout(() => playBellSoundOnce(ctx), 1000);
             } catch (e) {
                 console.log("Audio alert playback error:", e);
             }
@@ -578,6 +610,10 @@
             const ownerBar = document.getElementById('ownerBar');
             if (window.isDeviceOwner()) {
                 ownerBar.style.display = 'flex';
+                // طلب صلاحية الإشعارات تلقائياً عند تفعيل وضع صاحب المطعم
+                if ("Notification" in window && Notification.permission !== "granted") {
+                    Notification.requestPermission();
+                }
             } else {
                 ownerBar.style.display = 'none';
             }
@@ -588,16 +624,13 @@
             const loginBox = document.getElementById('adminLoginBox');
             const mainContent = document.getElementById('adminMainContent');
 
-            // حساب عدد مرات الدخول
             let counter = parseInt(localStorage.getItem('dr_login_counter') || '0');
 
-            // يتوجب أدخال الباسورد إذا: لم يسبق الدخول كصاحب مطعم أو استوفى 3 مرات دخول
             if (!window.isDeviceOwner() || counter >= 3) {
                 loginBox.style.display = 'block';
                 mainContent.style.display = 'none';
                 document.getElementById('adminPassLoginInput').value = '';
             } else {
-                // دخول مباشر (المرات 1، 2، 3)
                 counter++;
                 localStorage.setItem('dr_login_counter', counter.toString());
                 loginBox.style.display = 'none';
@@ -613,7 +646,6 @@
             const currentServerPass = window.serverPass || '1234';
 
             if (enteredPass === currentServerPass) {
-                // كلمة سر صحيحة
                 let currentToken = window.serverToken;
                 if (!currentToken) {
                     currentToken = "token_" + Date.now();
@@ -621,7 +653,7 @@
                 }
 
                 localStorage.setItem('dr_owner_token', currentToken);
-                localStorage.setItem('dr_login_counter', '1'); // البدء بـ 1 بعد إدخال الباسورد
+                localStorage.setItem('dr_login_counter', '1');
 
                 window.checkOwnerBadge();
 
@@ -1074,7 +1106,6 @@
                 totalAmount: currentTotal, timestamp: Date.now()
             };
 
-            // تسجيل الطلب بسجل قاعدة البيانات
             if (typeof window.saveOrderToFirebase === 'function') {
                 window.saveOrderToFirebase(orderPayload).catch(err => console.error(err));
             }
@@ -1200,7 +1231,6 @@
             }).join('');
         }
 
-        /* تغيير كلمة السر واستثناء أصحاب المطاعم الآخرين */
         function saveNewPassword() {
             const currentP = document.getElementById('currentPassInput').value.trim();
             const p1 = document.getElementById('newPassInput').value.trim();
@@ -1212,14 +1242,12 @@
             if (currentP !== actualCurrentPass) return alert("❌ كلمة السر الحالية غير صحيحة!");
             if (p1 !== p2) return alert("❌ كلمتا السر الجديدتان غير متطابقتين!");
 
-            // توليد رمز مميز جديد لاستثناء الآخرين تلقائياً
             const newToken = "token_" + Date.now();
 
             if (window.setGlobalPassToken) {
                 window.setGlobalPassToken(p1, newToken);
             }
 
-            // احتفاظ صاحب المطعم الحالي بالصلاحية
             localStorage.setItem('dr_owner_token', newToken);
             localStorage.setItem('dr_login_counter', '1');
 
