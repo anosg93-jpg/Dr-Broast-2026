@@ -41,7 +41,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
         body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 70px; }
 
-        /* الحاوية المجمعة للوجو والأيقونة فوقه */
+        /* الحاوية المركزية للوجو والشارة فوقه */
         .logo-center-wrapper {
             display: flex;
             flex-direction: column;
@@ -50,7 +50,7 @@
             gap: 5px;
         }
 
-        /* أيقونة صاحب المطعم الثابتة فوق اللوجو */
+        /* شارة صاحب المطعم الثابتة فوق اللوجو */
         .owner-top-pill {
             background: linear-gradient(135deg, #d85000, #ff9800);
             color: #ffffff;
@@ -268,7 +268,7 @@
 </head>
 <body>
 
-    <!-- عنصر صوتي صامت مستمر لإبقاء الاتصال حياً عند قفل الشاشة -->
+    <!-- مشغل صوتي صامت مستمر لإبقاء المتصفح متصلاً بالسيرفر أثناء قفل الشاشة -->
     <audio id="bgKeepAliveAudio" loop style="display:none;" preload="auto"></audio>
 
     <!-- شاشة البداية -->
@@ -288,7 +288,7 @@
             <div class="header-top">
                 <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
                 
-                <!-- الحاوية المركزية للوجو وفوقه شارة صاحب المطعم مباشرة -->
+                <!-- الحاوية المدمجة للوجو والشارة فوقه مباشرة -->
                 <div class="logo-center-wrapper">
                     <div id="ownerTopPill" class="owner-top-pill" onclick="openAdminPanel()">
                         <span>👑 صاحب المطعم</span>
@@ -404,7 +404,7 @@
                 <div style="text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 2.5rem; margin-bottom: 5px;">🔐</div>
                     <h3 style="font-weight: 900; color: #1d2939; font-size: 1.1rem;">دخول لوحة التحكم</h3>
-                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل هوية صاحب المطعم واستقبال الإشعارات في الهاتف</p>
+                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل وضع صاحب المطعم واستقبال الإشعارات في الهاتف</p>
                 </div>
                 <label>كلمة المرور</label>
                 <input type="password" id="adminPassLoginInput" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyAdminLogin()">
@@ -448,11 +448,11 @@
         </div>
     </div>
 
-    <!-- تسجيل Service Worker ليعمل في خلفية الهاتف وشاشة القفل -->
+    <!-- تسجيل Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
                     console.log('SW Registered:', reg.scope);
                 }).catch(err => console.log('SW Fail:', err));
             });
@@ -524,9 +524,9 @@
                     // تشغيل الصوت التنبيهي
                     window.playBellNotification();
 
-                    // إرسال الإشعار الكتابي لشاشة القفل وستارة إشعارات الموبايل
+                    // إرسال الإشعار المكتوب المطابق للصورة تماماً
                     window.showAndroidPhoneNotification(
-                        "🍗 أوردر جديد - Dr. Broast", 
+                        "أوردر جديد - Dr. Broast 🍗", 
                         "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!"
                     );
                 }
@@ -553,34 +553,33 @@
 
         let disabledItems = JSON.parse(localStorage.getItem('dr_disabled_items') || '[]');
 
-        /* محرك إبقاء اتصال السيرفر نشطاً في الخلفية وعند قفل الشاشة */
+        /* محرك إبقاء الاتصال حياً في الخلفية */
         function enableBackgroundKeepAlive() {
             try {
                 const audio = document.getElementById('bgKeepAliveAudio');
-                // نغمة صامتة Base64 خفيفة لا تصدر صوتاً ولكن تبقي المتصفح والإنترنت نشطين
                 audio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==";
                 audio.play().catch(()=>{});
             } catch(e){}
         }
 
-        /* دالة إرسال إشعار النظام المباشر للموبايل عبر Service Worker */
+        /* دالة إرسال إشعار النظام المباشر للموبايل */
         window.showAndroidPhoneNotification = async function(title, body) {
             if (!("Notification" in window)) return;
 
-            const iconAbsoluteUrl = new URL('images/logotempo.png', window.location.href).href;
+            const iconUrl = new URL('images/logotempo.png', window.location.href).href;
 
             const options = {
                 body: body,
-                icon: iconAbsoluteUrl,
-                badge: iconAbsoluteUrl,
+                icon: iconUrl,
+                badge: iconUrl,
                 vibrate: [500, 200, 500, 200, 600],
-                tag: "drbroast-order-" + Date.now(),
+                tag: "drbroast-" + Date.now(),
                 renotify: true,
                 requireInteraction: true,
                 data: { url: window.location.href }
             };
 
-            const triggerViaSW = (reg) => {
+            const triggerDirect = (reg) => {
                 if (reg && reg.showNotification) {
                     reg.showNotification(title, options);
                 } else if (navigator.serviceWorker && navigator.serviceWorker.controller) {
@@ -594,18 +593,18 @@
 
             if (Notification.permission === "granted") {
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.ready.then(reg => triggerViaSW(reg)).catch(() => triggerViaSW(null));
+                    navigator.serviceWorker.ready.then(reg => triggerDirect(reg)).catch(() => triggerDirect(null));
                 }
             } else {
                 Notification.requestPermission().then(permission => {
                     if (permission === 'granted' && 'serviceWorker' in navigator) {
-                        navigator.serviceWorker.ready.then(reg => triggerViaSW(reg));
+                        navigator.serviceWorker.ready.then(reg => triggerDirect(reg));
                     }
                 });
             }
         };
 
-        /* التنبيه الصوتي الأصلي المعتمد */
+        /* التنبيه الصوتي المعتمد */
         function playBellSoundOnce(audioCtx) {
             const now = audioCtx.currentTime;
             [1046.5, 2093.0].forEach(freq => { 
@@ -682,7 +681,15 @@
 
             if (enteredPass === currentServerPass) {
                 if ("Notification" in window) {
-                    Notification.requestPermission();
+                    Notification.requestPermission().then(perm => {
+                        if (perm === 'granted') {
+                            // إشعار تأكيدي فوري يظهر لصاحب المطعم في ستارة الهاتف فور كتابة كلمة السر
+                            window.showAndroidPhoneNotification(
+                                "أوردر جديد - Dr. Broast 🍗", 
+                                "🔔 تم تفعيل إشعارات الهاتف بنجاح! ستصلك جميع الأوردرات هنا."
+                            );
+                        }
+                    });
                 }
 
                 enableBackgroundKeepAlive();
