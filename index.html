@@ -41,20 +41,19 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
         body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 70px; }
 
-        /* شريط التمييز العلوي لصاحب المطعم */
-        .owner-top-bar {
+        /* شارة صاحب المطعم الفاخرة في أعلى التطبيق */
+        .owner-badge-bar {
             background: linear-gradient(90deg, #d85000, #ff9800);
             color: #ffffff;
             text-align: center;
-            padding: 8px 12px;
-            font-size: 0.85rem;
+            padding: 6px 12px;
+            font-size: 0.82rem;
             font-weight: 900;
             display: none;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            box-shadow: 0 2px 10px rgba(216, 80, 0, 0.3);
-            cursor: pointer;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(216, 80, 0, 0.3);
         }
 
         /* --- شاشة الترحيب --- */
@@ -258,9 +257,9 @@
 </head>
 <body>
 
-    <!-- شريط صاحب المطعم العلوي مع تفعيل الإشعارات بالضغط -->
-    <div id="ownerBar" class="owner-top-bar" onclick="requestNotificationPermission()">
-        <span>👑 وضع صاحب المطعم نشط (اضغط هنا لتفعيل الإشعارات النصية الفورية)</span>
+    <!-- شارة صاحب المطعم الفاخرة التي تظهر تلقائياً عندما يكون وضع الإدارة نشطاً -->
+    <div id="ownerBadgeBar" class="owner-badge-bar">
+        <span>👑 وضع صاحب المطعم نشط</span>
     </div>
 
     <!-- شاشة البداية -->
@@ -439,32 +438,15 @@
         </div>
     </div>
 
-    <!-- تسجيل Service Worker لدعم الإشعارات في الخلفية -->
+    <!-- تسجيل Service Worker لدعم إشعارات النظام الحقيقية -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                const swCode = `
-                    self.addEventListener('install', (e) => { self.skipWaiting(); });
-                    self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
-                    self.addEventListener('push', (e) => {
-                        const data = e.data ? e.data.json() : { title: "أوردر جديد - Dr. Broast", body: "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!" };
-                        e.waitUntil(
-                            self.registration.showNotification(data.title, {
-                                body: data.body,
-                                icon: "images/logotempo.png",
-                                badge: "images/logotempo.png",
-                                vibrate: [200, 100, 200],
-                                tag: "new-order",
-                                renotify: true
-                            })
-                        );
-                    });
-                `;
-                const blob = new Blob([swCode], { type: 'text/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl)
-                    .then(reg => console.log('Service Worker registered successfully'))
-                    .catch(err => console.log('SW registration failed:', err));
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('ServiceWorker registered successfully:', reg.scope);
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed:', err);
+                });
             });
         }
     </script>
@@ -532,7 +514,7 @@
             if (!isInitialLoad && data) {
                 if (window.isDeviceOwner && window.isDeviceOwner()) {
                     window.playBellNotification();
-                    // إشعار النظام المكتوب بالتنسيق المطلق تماماً
+                    // إشعار النظام المكتوب بالتنسيق المطلوب بالضبط
                     window.showPushNotification("أوردر جديد - Dr. Broast 🍗", "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!");
                 }
             }
@@ -558,18 +540,12 @@
 
         let disabledItems = JSON.parse(localStorage.getItem('dr_disabled_items') || '[]');
 
-        /* --- تفعيل إشعارات المتصفح (Web Notifications) --- */
-        window.requestNotificationPermission = function() {
-            if ("Notification" in window) {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        alert("✅ تم تفعيل الإشعارات النصية بنجاح! ستظهر لك رسائل الأوردرات حتى لو الشاشة مقفولة.");
-                    } else {
-                        alert("⚠️ يرجى السماح بالإشعارات من إعدادات المتصفح لضمان وصول رسائل الأوردرات.");
-                    }
-                });
+        /* --- تفعيل إشعارات المتصفح (Web Push Notifications) تلقائياً لصاحب المطعم --- */
+        function requestNotificationPermissionSilently() {
+            if ("Notification" in window && Notification.permission !== "granted") {
+                Notification.requestPermission();
             }
-        };
+        }
 
         window.showPushNotification = function(title, body) {
             if ("Notification" in window && Notification.permission === "granted") {
@@ -636,14 +612,12 @@
         };
 
         window.checkOwnerBadge = function() {
-            const ownerBar = document.getElementById('ownerBar');
+            const ownerBadgeBar = document.getElementById('ownerBadgeBar');
             if (window.isDeviceOwner()) {
-                ownerBar.style.display = 'flex';
-                if ("Notification" in window && Notification.permission !== "granted") {
-                    Notification.requestPermission();
-                }
+                ownerBadgeBar.style.display = 'flex';
+                requestNotificationPermissionSilently();
             } else {
-                ownerBar.style.display = 'none';
+                ownerBadgeBar.style.display = 'none';
             }
         };
 
