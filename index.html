@@ -179,7 +179,7 @@
             font-size: 0.78rem; font-weight: 800; display: inline-block; margin-top: 6px;
         }
 
-        /* --- كروت قسم العروض (عرض الصورة بالكامل بشكل أنيق) --- */
+        /* --- كروت قسم العروض --- */
         .offer-card {
             background: var(--white);
             border-radius: 24px;
@@ -685,7 +685,7 @@
         let selectedPaymentMethod = 'cash';
         let currentCat = '';
 
-        /* تحديد ما إذا كان المستخدم هو صاحب المطعم أم لا */
+        /* تحديد مدى الحياة ما إذا كان هذا الجهاز يعود لصاحب المطعم أم لا */
         let isRestaurantOwner = localStorage.getItem('dr_is_owner') === 'true';
 
         /* نظام حالة لوحة تحكم المطعم */
@@ -1246,28 +1246,28 @@
         }
 
         /* ------------------------------------------------------------- */
-        /* --- نظام نغمة الجرس المتكرر القوية الملحوظة (ثانيتين بالضبط) --- */
+        /* --- نظام نغمة الجرس المتكرر القوية (لمدة ثانيتين 2s بالضبط) --- */
         /* ------------------------------------------------------------- */
         function triggerOrderLoudAlert() {
             try {
-                /* 1. إنشاء جرس متكرر قوي ملحوظ لمدة 2 ثانية باستخدام AudioContext */
+                /* 1. إصدار نغمة جرس متكررة قوية ملحوظة لمدة ثانيتين (2 ثانية) */
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) {
                     const audioCtx = new AudioContext();
                     const now = audioCtx.currentTime;
                     
-                    // عمل 4 دقات جرس متكررة خلال 2 ثانية (دقة كل 0.5 ثانية)
+                    // عمل 4 نغمات جرس متكررة وقوية خلال 2 ثانية (نغمة كل 0.5 ثانية)
                     const bellTimes = [0, 0.5, 1.0, 1.5];
                     
                     bellTimes.forEach(delay => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
                         
-                        osc.type = 'triangle'; // نغمة جرس واضحة وقوية
-                        osc.frequency.setValueAtTime(987.77, now + delay); // نغمة B5 المرتفعة
-                        osc.frequency.exponentialRampToValueAtTime(493.88, now + delay + 0.4); // انخفاض سريع مثل الجرس
+                        osc.type = 'triangle'; // صوت جرس حاد وقوي
+                        osc.frequency.setValueAtTime(987.77, now + delay); // نغمة B5 العالية
+                        osc.frequency.exponentialRampToValueAtTime(493.88, now + delay + 0.4); // انخفاض تدريجي يشبه الجرس Real Bell
                         
-                        gain.gain.setValueAtTime(0.9, now + delay);
+                        gain.gain.setValueAtTime(0.95, now + delay);
                         gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.45);
                         
                         osc.connect(gain);
@@ -1278,22 +1278,22 @@
                     });
                 }
 
-                /* 2. اهتزاز الجهاز إضافي لتأكيد التنبيه */
+                /* 2. هزة اهتزاز للموبايل إضافية لزيادة الانتباه */
                 if ("vibrate" in navigator) {
                     navigator.vibrate([400, 100, 400, 100, 400, 100, 400]);
                 }
 
-                /* 3. إرسال إشعار النظام المباشر */
+                /* 3. إرسال إشعار مباشر للنظام */
                 if ("Notification" in window && Notification.permission === "granted") {
                     new Notification("🚨 طلب جديد وصل من مطعم Dr. Broast!", {
-                        body: "تم استقبال أوردر جديد بنجاح عبر التطبيق!",
+                        body: "تم استقبال أوردر جديد بنجاح وحفظه في سجل الطلبات!",
                         icon: "images/logotempo.png",
                         vibrate: [400, 100, 400, 100, 400, 100, 400],
                         requireInteraction: true
                     });
                 }
             } catch (err) {
-                console.log('Bell Sound Triggered', err);
+                console.log('Bell Sound Error', err);
             }
         }
 
@@ -1341,7 +1341,7 @@
             msg += `💰 *الإجمالي الكلي النقدي:* *${currentTotal} ج.م*\n\n`;
             msg += `شكراً لاختياركم Dr. Broast! ✨`;
 
-            /* حفظ الطلب في سجل الطلبات لوحة الإدارة */
+            /* التسجيل التلقائي والمباشر للطلب في سجل طلبات لوحة تحكم المطعم */
             const orderRecord = {
                 id: Date.now(),
                 date: new Date().toLocaleString('ar-EG'),
@@ -1354,7 +1354,7 @@
             adminConfig.ordersHistory.unshift(orderRecord);
             localStorage.setItem('dr_orders_history', JSON.stringify(adminConfig.ordersHistory));
 
-            /* إطلاق صوت الجرس المتكرر للزبون ولصاحب المطعم على حد سواء */
+            /* إطلاق نغمة الجرس المتكررة العالية (لمدة ثانيتين) عند تأكيد الطلب */
             triggerOrderLoudAlert();
 
             window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
@@ -1382,7 +1382,7 @@
             }
 
             if (enteredPass === adminConfig.password) {
-                /* تسجيل الهاتف كـ "صاحب مطعم" */
+                /* إعطاء الهاتف مسمى "صاحب مطعم" مدى الحياة وتخزينه بصورة دائمة */
                 isRestaurantOwner = true;
                 localStorage.setItem('dr_is_owner', 'true');
 
