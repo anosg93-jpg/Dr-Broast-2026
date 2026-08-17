@@ -638,16 +638,8 @@
 
             <!-- 1. قسم التحكم بالمنيو -->
             <div id="adminTabMenuControl" class="admin-section active">
-                <div class="toggle-switch" style="background: var(--accent-light); border-color: var(--accent);">
-                    <label style="color: var(--accent);">🔴 حالة المنيو حالياً (معطل بالكامل)</label>
-                    <label class="switch">
-                        <input type="checkbox" id="disableAllMenuToggle" onchange="toggleDisableAllMenu(this.checked)">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
-                <h4 style="margin: 15px 0 10px 0; font-weight: 800; font-size: 0.9rem;">التحكم بالأصناف فرديًا:</h4>
-                <div id="adminItemsList" style="max-height: 300px; overflow-y: auto;"></div>
+                <h4 style="margin: 10px 0; font-weight: 800; font-size: 0.9rem;">التحكم بالأصناف فرديًا:</h4>
+                <div id="adminItemsList" style="max-height: 320px; overflow-y: auto;"></div>
             </div>
 
             <!-- 2. قسم سجل الطلبات -->
@@ -692,6 +684,9 @@
         let selectedOrderType = 'delivery';
         let selectedPaymentMethod = 'cash';
         let currentCat = '';
+
+        /* تحديد ما إذا كان المستخدم هو صاحب المطعم أم لا */
+        let isRestaurantOwner = localStorage.getItem('dr_is_owner') === 'true';
 
         /* نظام حالة لوحة تحكم المطعم */
         let adminConfig = {
@@ -885,7 +880,7 @@
                     }
                 }
 
-                /* تصميم كارت قسم العروض (عرض الصورة بالكامل بدون اقتطاع) */
+                /* تصميم كارت قسم العروض */
                 if (isOffers) {
                     return `
                     <div class="offer-card ${isItemDisabled ? 'disabled' : ''}" data-category="${item.category}" data-raw-price="${item.rawPrice}" data-base-price="${priceInfo.numericValue}" data-price="${priceInfo.numericValue}" data-is-percent="${priceInfo.isPercent}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
@@ -1238,7 +1233,7 @@
         function fallbackCopy(text, btn) {
             const textArea = document.createElement('textarea');
             textArea.value = text;
-            textArea.style.style.position = 'fixed';
+            textArea.style.position = 'fixed';
             textArea.style.opacity = '0';
             document.body.appendChild(textArea);
             textArea.select();
@@ -1251,58 +1246,54 @@
         }
 
         /* ------------------------------------------------------------- */
-        /* --- نظام التنبيه الصوتي القوي الملحوظ لمدة ثانيتين بالظبط --- */
+        /* --- نظام نغمة الجرس المتكرر القوية الملحوظة (ثانيتين بالضبط) --- */
         /* ------------------------------------------------------------- */
         function triggerOrderLoudAlert() {
             try {
-                /* 1. تشغيل تنبيه صوتي قوي ثنائي النغمة لمدة 2 ثانية */
+                /* 1. إنشاء جرس متكرر قوي ملحوظ لمدة 2 ثانية باستخدام AudioContext */
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) {
                     const audioCtx = new AudioContext();
-                    const osc1 = audioCtx.createOscillator();
-                    const osc2 = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-
-                    osc1.type = 'sawtooth';
-                    osc2.type = 'square';
-
-                    osc1.frequency.setValueAtTime(880, audioCtx.currentTime); // نغمة مرتفعة (A5)
-                    osc2.frequency.setValueAtTime(440, audioCtx.currentTime); // نغمة عميقة (A4)
-
-                    // تدرج التنبيه القوي
-                    osc1.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.5);
-                    osc1.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 1.0);
-                    osc1.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 1.5);
-
-                    gainNode.gain.setValueAtTime(0.8, audioCtx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 2.0);
-
-                    osc1.connect(gainNode);
-                    osc2.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-
-                    osc1.start();
-                    osc2.start();
-                    osc1.stop(audioCtx.currentTime + 2.0);
-                    osc2.stop(audioCtx.currentTime + 2.0);
+                    const now = audioCtx.currentTime;
+                    
+                    // عمل 4 دقات جرس متكررة خلال 2 ثانية (دقة كل 0.5 ثانية)
+                    const bellTimes = [0, 0.5, 1.0, 1.5];
+                    
+                    bellTimes.forEach(delay => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        
+                        osc.type = 'triangle'; // نغمة جرس واضحة وقوية
+                        osc.frequency.setValueAtTime(987.77, now + delay); // نغمة B5 المرتفعة
+                        osc.frequency.exponentialRampToValueAtTime(493.88, now + delay + 0.4); // انخفاض سريع مثل الجرس
+                        
+                        gain.gain.setValueAtTime(0.9, now + delay);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.45);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start(now + delay);
+                        osc.stop(now + delay + 0.45);
+                    });
                 }
 
                 /* 2. اهتزاز الجهاز إضافي لتأكيد التنبيه */
                 if ("vibrate" in navigator) {
-                    navigator.vibrate([500, 200, 500, 200, 600]);
+                    navigator.vibrate([400, 100, 400, 100, 400, 100, 400]);
                 }
 
-                /* 3. إرسال إشعارات النظام حتى لو الشاشة مقفولة والجوال في الجيب */
+                /* 3. إرسال إشعار النظام المباشر */
                 if ("Notification" in window && Notification.permission === "granted") {
                     new Notification("🚨 طلب جديد وصل من مطعم Dr. Broast!", {
-                        body: "هناك طلب جديد بحاجة للمراجعة الآن!",
+                        body: "تم استقبال أوردر جديد بنجاح عبر التطبيق!",
                         icon: "images/logotempo.png",
-                        vibrate: [500, 200, 500, 200, 600],
+                        vibrate: [400, 100, 400, 100, 400, 100, 400],
                         requireInteraction: true
                     });
                 }
             } catch (err) {
-                console.log('Order Sound Alert Triggered', err);
+                console.log('Bell Sound Triggered', err);
             }
         }
 
@@ -1363,7 +1354,7 @@
             adminConfig.ordersHistory.unshift(orderRecord);
             localStorage.setItem('dr_orders_history', JSON.stringify(adminConfig.ordersHistory));
 
-            /* إطلاق التنبيه الصوتي القوي الملحوظ بدقة عند طلب أي زبون للأوردر */
+            /* إطلاق صوت الجرس المتكرر للزبون ولصاحب المطعم على حد سواء */
             triggerOrderLoudAlert();
 
             window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
@@ -1391,6 +1382,10 @@
             }
 
             if (enteredPass === adminConfig.password) {
+                /* تسجيل الهاتف كـ "صاحب مطعم" */
+                isRestaurantOwner = true;
+                localStorage.setItem('dr_is_owner', 'true');
+
                 closeCreativePassModal();
                 openAdminPanel();
             } else {
@@ -1399,13 +1394,11 @@
         }
 
         function openAdminPanel() {
-            // طلب إذن الإشعارات عند فتح اللوحة لضمان عمل التنبيه والصوت والدعم الكامل
             if ("Notification" in window && Notification.permission !== "granted") {
                 Notification.requestPermission();
             }
 
             document.getElementById('adminModal').style.display = 'flex';
-            document.getElementById('disableAllMenuToggle').checked = adminConfig.isMenuDisabled;
             renderAdminItemsList();
             renderAdminOrdersList();
         }
@@ -1428,15 +1421,8 @@
         function setFullMenuState(isDisabled) {
             adminConfig.isMenuDisabled = isDisabled;
             localStorage.setItem('dr_menu_disabled', isDisabled);
-            document.getElementById('disableAllMenuToggle').checked = isDisabled;
             filterCat(currentCat);
             alert(isDisabled ? "🛑 تم إغلاق المنيو بالكامل بنجاح" : "✅ تم تشغيل المنيو بالكامل بنجاح");
-        }
-
-        function toggleDisableAllMenu(disabled) {
-            adminConfig.isMenuDisabled = disabled;
-            localStorage.setItem('dr_menu_disabled', disabled);
-            filterCat(currentCat);
         }
 
         function renderAdminItemsList() {
