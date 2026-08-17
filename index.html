@@ -117,8 +117,24 @@
         .badge { position: absolute; top: -5px; right: -5px; background: var(--accent); color: #ffffff; font-size: 10px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; transform: scale(0); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .badge.show { transform: scale(1); }
         
+        /* شارة صاحب المطعم العلوية مدى الحياة */
+        .owner-badge-header {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #2b1810, #f95e07);
+            color: #ffffff;
+            font-size: 0.82rem;
+            font-weight: 900;
+            padding: 4px 16px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(249, 94, 7, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
         .header-center-addr {
-            margin-top: 10px;
+            margin-top: 6px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -471,6 +487,11 @@
                 </div>
             </div>
             
+            <!-- شارة صاحب المطعم تظهر علوياً مدى الحياة بعد إدخال الباسورد مرة واحدة -->
+            <div class="owner-badge-header" id="ownerBadgeHeader">
+                👑 صاحب المطعم
+            </div>
+
             <div class="header-center-addr">
                 <span>📍 المطرية - الدقهلية</span>
                 <span style="opacity: 0.5;">|</span>
@@ -529,7 +550,7 @@
         <p class="footer-rights">جميع الحقوق محفوظة لـ مطعم Dr. Broast 2026 ©</p>
 
         <!-- زر لوحة تحكم المطعم الكريتيف -->
-        <button type="button" class="admin-trigger-btn" onclick="openCreativePassModal()">
+        <button type="button" class="admin-trigger-btn" onclick="handleAdminTriggerClick()">
             👑 لوحة تحكم المطعم
         </button>
     </footer>
@@ -685,8 +706,11 @@
         let selectedPaymentMethod = 'cash';
         let currentCat = '';
 
-        /* تحديد مدى الحياة ما إذا كان هذا الجهاز يعود لصاحب المطعم أم لا */
+        /* تحديد ما إذا كان المستخدم هو صاحب المطعم أم لا (مدى الحياة على هذا الهاتف) */
         let isRestaurantOwner = localStorage.getItem('dr_is_owner') === 'true';
+
+        /* عداد الدخول للوحة التحكم بدون باسورد لصاحب المطعم (كل 3 مرات) */
+        let ownerAccessCount = parseInt(localStorage.getItem('dr_owner_access_count') || '0');
 
         /* نظام حالة لوحة تحكم المطعم */
         let adminConfig = {
@@ -695,6 +719,20 @@
             disabledItems: JSON.parse(localStorage.getItem('dr_disabled_items') || '[]'),
             ordersHistory: JSON.parse(localStorage.getItem('dr_orders_history') || '[]')
         };
+
+        // التحقق من شارة صاحب المطعم عند التشغيل
+        checkOwnerBadge();
+
+        function checkOwnerBadge() {
+            const badge = document.getElementById('ownerBadgeHeader');
+            if (badge) {
+                if (isRestaurantOwner) {
+                    badge.style.display = 'inline-flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -1246,28 +1284,28 @@
         }
 
         /* ------------------------------------------------------------- */
-        /* --- نظام نغمة الجرس المتكرر القوية (لمدة ثانيتين 2s بالضبط) --- */
+        /* --- نظام نغمة الجرس المتكرر القوية (لمدة ثانيتين بالضبط) --- */
         /* ------------------------------------------------------------- */
         function triggerOrderLoudAlert() {
             try {
-                /* 1. إصدار نغمة جرس متكررة قوية ملحوظة لمدة ثانيتين (2 ثانية) */
+                /* 1. إنشاء جرس متكرر قوي ملحوظ لمدة 2 ثانية باستخدام AudioContext */
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) {
                     const audioCtx = new AudioContext();
                     const now = audioCtx.currentTime;
                     
-                    // عمل 4 نغمات جرس متكررة وقوية خلال 2 ثانية (نغمة كل 0.5 ثانية)
+                    // 4 دقات جرس متكررة خلال 2 ثانية (دقة كل 0.5 ثانية)
                     const bellTimes = [0, 0.5, 1.0, 1.5];
                     
                     bellTimes.forEach(delay => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
                         
-                        osc.type = 'triangle'; // صوت جرس حاد وقوي
-                        osc.frequency.setValueAtTime(987.77, now + delay); // نغمة B5 العالية
-                        osc.frequency.exponentialRampToValueAtTime(493.88, now + delay + 0.4); // انخفاض تدريجي يشبه الجرس Real Bell
+                        osc.type = 'triangle'; // نغمة جرس واضحة وقوية
+                        osc.frequency.setValueAtTime(987.77, now + delay); // نغمة B5 المرتفعة
+                        osc.frequency.exponentialRampToValueAtTime(493.88, now + delay + 0.4); // انخفاض سريع مثل الجرس
                         
-                        gain.gain.setValueAtTime(0.95, now + delay);
+                        gain.gain.setValueAtTime(0.9, now + delay);
                         gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.45);
                         
                         osc.connect(gain);
@@ -1278,22 +1316,22 @@
                     });
                 }
 
-                /* 2. هزة اهتزاز للموبايل إضافية لزيادة الانتباه */
+                /* 2. اهتزاز الجهاز إضافي لتأكيد التنبيه */
                 if ("vibrate" in navigator) {
                     navigator.vibrate([400, 100, 400, 100, 400, 100, 400]);
                 }
 
-                /* 3. إرسال إشعار مباشر للنظام */
+                /* 3. إرسال إشعار النظام المباشر لصاحب المطعم وللزبون */
                 if ("Notification" in window && Notification.permission === "granted") {
                     new Notification("🚨 طلب جديد وصل من مطعم Dr. Broast!", {
-                        body: "تم استقبال أوردر جديد بنجاح وحفظه في سجل الطلبات!",
+                        body: "تم استقبال أوردر جديد بنجاح وتم تسجيله في سجل الطلبات!",
                         icon: "images/logotempo.png",
                         vibrate: [400, 100, 400, 100, 400, 100, 400],
                         requireInteraction: true
                     });
                 }
             } catch (err) {
-                console.log('Bell Sound Error', err);
+                console.log('Bell Sound Triggered', err);
             }
         }
 
@@ -1341,7 +1379,7 @@
             msg += `💰 *الإجمالي الكلي النقدي:* *${currentTotal} ج.م*\n\n`;
             msg += `شكراً لاختياركم Dr. Broast! ✨`;
 
-            /* التسجيل التلقائي والمباشر للطلب في سجل طلبات لوحة تحكم المطعم */
+            /* حفظ الطلب وتأكيده في سجل الطلبات فور الضغط على تأكيد الطلب */
             const orderRecord = {
                 id: Date.now(),
                 date: new Date().toLocaleString('ar-EG'),
@@ -1354,15 +1392,36 @@
             adminConfig.ordersHistory.unshift(orderRecord);
             localStorage.setItem('dr_orders_history', JSON.stringify(adminConfig.ordersHistory));
 
-            /* إطلاق نغمة الجرس المتكررة العالية (لمدة ثانيتين) عند تأكيد الطلب */
+            /* إطلاق صوت الجرس المتكرر لمدة ثانيتين للزبون وصاحب المطعم فور ضغط تأكيد الطلب */
             triggerOrderLoudAlert();
 
             window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
         }
 
         /* ------------------------------------------------------------- */
-        /* --- وظائف لوحة تحكم المطعم (إدارة المطعم) --- */
+        /* --- وظائف لوحة تحكم المطعم (إدارة المطعم مع منطق الـ 3 مرات) --- */
         /* ------------------------------------------------------------- */
+
+        function handleAdminTriggerClick() {
+            if (isRestaurantOwner) {
+                // صاحب المطعم: زيادة عداد الدخول
+                ownerAccessCount++;
+                localStorage.setItem('dr_owner_access_count', ownerAccessCount.toString());
+
+                if (ownerAccessCount >= 4) {
+                    // المرة الرابعة: طلب كلمة السر كـ أمان فقط
+                    ownerAccessCount = 0; // إعادة العداد للبدء من جديد
+                    localStorage.setItem('dr_owner_access_count', '0');
+                    openCreativePassModal();
+                } else {
+                    // الدخول مباشرة في أول 3 مرات
+                    openAdminPanel();
+                }
+            } else {
+                // ليس صاحب مطعم بعد: يفتح مودال كلمة السر
+                openCreativePassModal();
+            }
+        }
 
         function openCreativePassModal() {
             document.getElementById('creativePassModal').style.display = 'flex';
@@ -1382,9 +1441,10 @@
             }
 
             if (enteredPass === adminConfig.password) {
-                /* إعطاء الهاتف مسمى "صاحب مطعم" مدى الحياة وتخزينه بصورة دائمة */
+                /* إعطاء مسمى صاحب المطعم مدى الحياة لهذا الهاتف */
                 isRestaurantOwner = true;
                 localStorage.setItem('dr_is_owner', 'true');
+                checkOwnerBadge();
 
                 closeCreativePassModal();
                 openAdminPanel();
