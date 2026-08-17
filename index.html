@@ -39,31 +39,26 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
-        body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 80px; }
+        body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 90px; }
 
-        /* أيقونة صاحب المطعم العائمة في مكان مستقل بعيداً عن اللوجو */
-        .owner-floating-pill {
+        /* أيقونة صاحب المطعم الثابتة في أسفل الشاشة */
+        .owner-bottom-fixed-btn {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 18px;
+            right: 18px;
             background: linear-gradient(135deg, #d85000, #ff9800);
             color: #ffffff;
             padding: 8px 16px;
-            border-radius: 30px;
+            border-radius: 25px;
             font-size: 0.82rem;
             font-weight: 900;
             display: none;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 6px 20px rgba(216, 80, 0, 0.4);
+            box-shadow: 0 6px 20px rgba(216, 80, 0, 0.45);
             cursor: pointer;
             z-index: 1500;
             border: 2px solid #ffffff;
-            animation: pulseFloating 2s infinite ease-in-out;
-        }
-        @keyframes pulseFloating {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.04); }
         }
 
         /* --- شاشة الترحيب --- */
@@ -103,7 +98,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.06); border-bottom: 1px solid var(--border-subtle);
         }
 
-        header { display: flex; flex-direction: column; align-items: center; padding: 14px 15px 10px 15px; background: var(--header-bg); }
+        header { display: flex; flex-direction: column; align-items: center; padding: 14px 15px 10px 15px; background: var(--header-bg); position: relative; }
         .header-top { width: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
         .header-logo-container { 
             width: 105px; height: 105px; border-radius: 26px; background: white; padding: 4px; 
@@ -263,8 +258,8 @@
 </head>
 <body>
 
-    <!-- أيقونة صاحب المطعم العائمة في أسفل الشاشة (بعيدة تماماً عن اللوجو) -->
-    <div id="ownerFloatingPill" class="owner-floating-pill" onclick="openAdminPanel()">
+    <!-- أيقونة صاحب المطعم الثابتة في أسفل الشاشة -->
+    <div id="ownerBottomBtn" class="owner-bottom-fixed-btn" onclick="openAdminPanel()">
         <span>👑 صاحب المطعم</span>
     </div>
 
@@ -393,7 +388,7 @@
                 <div style="text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 2.5rem; margin-bottom: 5px;">🔐</div>
                     <h3 style="font-weight: 900; color: #1d2939; font-size: 1.1rem;">دخول لوحة التحكم</h3>
-                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل هوية صاحب المطعم واستقبال الإشعارات في الهاتف</p>
+                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل وضع صاحب المطعم واستلام إشعارات الهاتف</p>
                 </div>
                 <label>كلمة المرور</label>
                 <input type="password" id="adminPassLoginInput" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyAdminLogin()">
@@ -437,13 +432,13 @@
         </div>
     </div>
 
-    <!-- تسجيل Service Worker فورياً -->
+    <!-- تسجيل Service Worker ليعمل في خلفية الهاتف وشاشة القفل -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(reg => {
                     console.log('SW Registered:', reg.scope);
-                }).catch(err => console.log('SW Register Error:', err));
+                }).catch(err => console.log('SW Fail:', err));
             });
         }
     </script>
@@ -513,8 +508,8 @@
                     // تشغيل الصوت التنبيهي الأصلي
                     window.playBellNotification();
 
-                    // إرسال الإشعار المكتوب في ستارة هاتف الأندرويد مباشرة
-                    window.showPushNotification(
+                    // إرسال الإشعار لستارة إشعارات الموبايل وشاشة القفل مباشرة
+                    window.triggerMobileSystemNotification(
                         "أوردر جديد - Dr. Broast 🍗", 
                         "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!"
                     );
@@ -542,17 +537,17 @@
 
         let disabledItems = JSON.parse(localStorage.getItem('dr_disabled_items') || '[]');
 
-        /* دالة إرسال الإشعار المتوافقة 100% مع أندرويد و Service Worker */
-        window.showPushNotification = function(title, body) {
+        /* دالة إرسال إشعار النظام الحقيقي للهاتف */
+        window.triggerMobileSystemNotification = function(title, body) {
             if (!("Notification" in window)) return;
 
-            const triggerNotification = (reg) => {
+            const sendNotification = (reg) => {
                 const options = {
                     body: body,
                     icon: "images/logotempo.png",
                     badge: "images/logotempo.png",
                     vibrate: [400, 200, 400, 200, 600],
-                    tag: "dr-order-" + Date.now(),
+                    tag: "dr-broast-order-" + Date.now(),
                     renotify: true,
                     requireInteraction: true,
                     data: { url: window.location.href }
@@ -562,7 +557,7 @@
                     reg.showNotification(title, options);
                 } else if (navigator.serviceWorker && navigator.serviceWorker.controller) {
                     navigator.serviceWorker.controller.postMessage({
-                        type: 'TRIGGER_NOTIF',
+                        type: 'SHOW_ORDER_NOTIF',
                         title: title,
                         options: options
                     });
@@ -572,15 +567,15 @@
             if (Notification.permission === "granted") {
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.ready.then(reg => {
-                        triggerNotification(reg);
+                        sendNotification(reg);
                     }).catch(() => {
-                        triggerNotification(null);
+                        sendNotification(null);
                     });
                 }
             } else {
-                Notification.requestPermission().then(perm => {
-                    if (perm === 'granted' && 'serviceWorker' in navigator) {
-                        navigator.serviceWorker.ready.then(reg => triggerNotification(reg));
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted' && 'serviceWorker' in navigator) {
+                        navigator.serviceWorker.ready.then(reg => sendNotification(reg));
                     }
                 });
             }
@@ -623,14 +618,14 @@
         };
 
         window.checkOwnerBadge = function() {
-            const ownerFloatingPill = document.getElementById('ownerFloatingPill');
+            const ownerBtn = document.getElementById('ownerBottomBtn');
             if (window.isDeviceOwner()) {
-                ownerFloatingPill.style.display = 'inline-flex';
+                ownerBtn.style.display = 'inline-flex';
                 if ("Notification" in window && Notification.permission !== "granted") {
                     Notification.requestPermission();
                 }
             } else {
-                ownerFloatingPill.style.display = 'none';
+                ownerBtn.style.display = 'none';
             }
         };
 
