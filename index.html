@@ -115,7 +115,6 @@
         .badge { position: absolute; top: -5px; right: -5px; background: var(--accent); color: #ffffff; font-size: 10px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; transform: scale(0); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .badge.show { transform: scale(1); }
         
-        /* شارة العنوان في أسفل منتصف اللوجو */
         .header-center-addr {
             margin-top: 10px;
             display: inline-flex;
@@ -156,7 +155,7 @@
         
         .menu-list { padding: 15px; max-width: 600px; margin: auto; }
         
-        /* كروت المنيو */
+        /* كروت المنيو العادية */
         .food-card { background: var(--white); border-radius: 24px; margin-bottom: 16px; display: flex; padding: 16px; gap: 15px; align-items: flex-start; box-shadow: 0 6px 18px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); }
         .item-img-box { width: 95px; height: 95px; border-radius: 18px; overflow: hidden; background: #e5e5ea; flex-shrink: 0; }
         .item-img-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -165,6 +164,53 @@
         .food-desc { font-size: 0.8rem; color: var(--desc-text); line-height: 1.4; margin-top: 4px; margin-bottom: 6px; }
         .food-price { font-weight: 900; color: var(--accent); font-size: 1.05rem; white-space: nowrap; }
         
+        /* --- كروت قسم العروض (تصميم رأسي كبير) --- */
+        .offer-card {
+            background: var(--white);
+            border-radius: 24px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+        .offer-img-box {
+            width: 100%;
+            height: 190px;
+            background: #e5e5ea;
+            position: relative;
+            overflow: hidden;
+        }
+        .offer-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .offer-badge-tag {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 4px 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .offer-info {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+        .offer-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
         /* الصندوق الإبداعي للإضافة */
         .addon-box {
             background: var(--bg);
@@ -179,143 +225,29 @@
             user-select: none;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .addon-box:hover {
-            border-color: var(--accent);
-        }
-        .addon-box.selected {
-            background: var(--accent-light);
-            border-color: var(--accent);
-            box-shadow: 0 3px 10px var(--accent-glow);
-        }
-        .addon-content {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .addon-custom-check {
-            width: 18px;
-            height: 18px;
-            border-radius: 6px;
-            border: 2px solid var(--desc-text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            font-size: 11px;
-            color: white;
-            font-weight: 900;
-            background: transparent;
-        }
-        .addon-box.selected .addon-custom-check {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-        .addon-label-text {
-            font-size: 0.83rem;
-            font-weight: 800;
-            color: var(--main-text);
-        }
-        .addon-box.selected .addon-label-text {
-            color: var(--accent);
-        }
-        .addon-price-badge {
-            font-size: 0.8rem;
-            font-weight: 800;
-            color: var(--accent);
-            background: rgba(249, 94, 7, 0.08);
-            padding: 2px 8px;
-            border-radius: 8px;
-        }
+        .addon-box:hover { border-color: var(--accent); }
+        .addon-box.selected { background: var(--accent-light); border-color: var(--accent); box-shadow: 0 3px 10px var(--accent-glow); }
+        .addon-content { display: flex; align-items: center; gap: 8px; }
+        .addon-custom-check { width: 18px; height: 18px; border-radius: 6px; border: 2px solid var(--desc-text); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; font-size: 11px; color: white; font-weight: 900; background: transparent; }
+        .addon-box.selected .addon-custom-check { background: var(--accent); border-color: var(--accent); }
+        .addon-label-text { font-size: 0.83rem; font-weight: 800; color: var(--main-text); }
+        .addon-box.selected .addon-label-text { color: var(--accent); }
+        .addon-price-badge { font-size: 0.8rem; font-weight: 800; color: var(--accent); background: rgba(249, 94, 7, 0.08); padding: 2px 8px; border-radius: 8px; }
 
         /* تنسيق أزرار الخيارات الصوص والنوع */
-        .sauce-section {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin: 6px 0;
-            background: rgba(249, 94, 7, 0.05);
-            padding: 5px 8px;
-            border-radius: 12px;
-            border: 1px dashed var(--border-subtle);
-        }
-        .sauce-title {
-            font-size: 0.73rem;
-            font-weight: 800;
-            color: var(--accent);
-            margin-left: 2px;
-            white-space: nowrap;
-        }
-        .sauce-btn {
-            background: var(--white);
-            border: 1px solid var(--border-subtle);
-            color: var(--main-text);
-            padding: 3px 10px;
-            min-width: 48px;
-            text-align: center;
-            border-radius: 8px;
-            font-size: 0.72rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .sauce-btn:hover {
-            border-color: var(--accent);
-        }
-        .sauce-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            box-shadow: 0 2px 6px var(--accent-glow);
-        }
+        .sauce-section { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin: 6px 0; background: rgba(249, 94, 7, 0.05); padding: 5px 8px; border-radius: 12px; border: 1px dashed var(--border-subtle); }
+        .sauce-title { font-size: 0.73rem; font-weight: 800; color: var(--accent); margin-left: 2px; white-space: nowrap; }
+        .sauce-btn { background: var(--white); border: 1px solid var(--border-subtle); color: var(--main-text); padding: 3px 10px; min-width: 48px; text-align: center; border-radius: 8px; font-size: 0.72rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease; }
+        .sauce-btn:hover { border-color: var(--accent); }
+        .sauce-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 6px var(--accent-glow); }
 
         /* شريط أزرار التحكم بالكمية وزر اطلب */
-        .action-row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-            width: 100%;
-            margin-top: auto;
-            padding-top: 6px;
-        }
+        .action-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%; margin-top: auto; padding-top: 6px; }
 
-        .qty-picker {
-            display: inline-flex;
-            align-items: center;
-            background: var(--bg);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 2px 4px;
-            gap: 4px;
-        }
-        .qty-btn {
-            background: var(--white);
-            border: 1px solid var(--border-subtle);
-            color: var(--accent);
-            width: 24px;
-            height: 24px;
-            border-radius: 8px;
-            font-weight: 900;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.2s ease;
-        }
-        .qty-btn:active {
-            transform: scale(0.9);
-            background: var(--accent-light);
-        }
-        .qty-val {
-            font-weight: 800;
-            font-size: 0.85rem;
-            color: var(--main-text);
-            min-width: 18px;
-            text-align: center;
-        }
+        .qty-picker { display: inline-flex; align-items: center; background: var(--bg); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 2px 4px; gap: 4px; }
+        .qty-btn { background: var(--white); border: 1px solid var(--border-subtle); color: var(--accent); width: 24px; height: 24px; border-radius: 8px; font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: all 0.2s ease; }
+        .qty-btn:active { transform: scale(0.9); background: var(--accent-light); }
+        .qty-val { font-weight: 800; font-size: 0.85rem; color: var(--main-text); min-width: 18px; text-align: center; }
 
         .order-btn { background: var(--accent); color: white; border: none; padding: 7px 20px; border-radius: 16px; font-size: 0.88rem; font-weight: 800; cursor: pointer; transition: transform 0.15s ease, background-color 0.3s ease; box-shadow: 0 4px 12px var(--accent-glow); }
         .order-btn:active { transform: scale(0.96); }
@@ -323,12 +255,7 @@
         .fly-item { position: fixed; z-index: 9999; pointer-events: none; width: 26px; height: 26px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1); }
 
         /* --- شريط التثبيت الذكي --- */
-        #install-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--accent);
-            color: white; padding: 15px 20px; display: none; justify-content: space-between;
-            align-items: center; z-index: 1500; box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
-            border-radius: 20px 20px 0 0; animation: slideUp 0.4s ease forwards;
-        }
+        #install-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--accent); color: white; padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 1500; box-shadow: 0 -4px 15px rgba(0,0,0,0.15); border-radius: 20px 20px 0 0; animation: slideUp 0.4s ease forwards; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .install-text { font-weight: 800; font-size: 0.95rem; }
         .install-btn { background: var(--white); color: var(--accent); border: none; padding: 8px 18px; border-radius: 12px; font-weight: 900; font-size: 0.85rem; cursor: pointer; }
@@ -351,7 +278,6 @@
         .phones-container { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         .footer-phone-call { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: white !important; padding: 8px 18px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 0.9rem; box-shadow: 0 4px 12px var(--accent-glow); }
         
-        /* أيقونات السوشيال ميديا الحقيقية */
         .social-icons-box { display: flex; justify-content: center; gap: 18px; margin: 22px 0 14px 0; }
         .social-btn-link { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-decoration: none; }
         .social-btn-link:hover { transform: translateY(-3px) scale(1.08); }
@@ -454,17 +380,14 @@
             </div>
         </div>
 
-        <!-- روابط السوشيال ميديا الحقيقية -->
+        <!-- روابط السوشيال ميديا -->
         <div class="social-icons-box">
-            <!-- فيسبوك -->
             <a href="https://www.facebook.com/profile.php?id=61592474410315" target="_blank" class="social-btn-link fb-color" title="فيسبوك">
                 <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
             </a>
-            <!-- إنستغرام -->
             <a href="https://www.instagram.com/dr.broast1?igsh=MXR4cXc0Z3pnM3AyZQ==" target="_blank" class="social-btn-link ig-color" title="إنستغرام">
                 <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
             </a>
-            <!-- واتساب -->
             <a href="https://wa.me/201091669151" target="_blank" class="social-btn-link wa-color" title="واتساب">
                 <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.528 2.022 14.056.996 11.43.996c-5.442 0-9.87 4.372-9.874 9.799-.001 1.742.483 3.442 1.398 4.914l-.995 3.637 3.737-.971zm10.873-6.53c-.293-.146-1.734-.852-2.001-.95-.267-.099-.463-.146-.659.146-.195.293-.759.95-.93 1.146-.171.195-.341.219-.634.073-.293-.146-1.239-.456-2.361-1.456-.872-.777-1.46-1.738-1.632-2.031-.171-.293-.018-.452.129-.597.132-.131.293-.341.44-.512.146-.171.195-.293.293-.488.098-.195.049-.366-.024-.512-.074-.146-.659-1.586-.902-2.17-.238-.574-.479-.496-.659-.506-.171-.008-.366-.01-.562-.01-.195 0-.513.073-.781.366-.269.293-1.025 1.001-1.025 2.441 0 1.439 1.049 2.83 1.196 3.025.146.195 2.064 3.15 5.003 4.415.699.301 1.244.482 1.67.618.703.223 1.344.192 1.85.117.564-.083 1.734-.707 1.978-1.39.244-.683.244-1.269.171-1.39-.073-.122-.269-.195-.562-.342z"/></svg>
             </a>
@@ -496,7 +419,7 @@
                 </button>
             </div>
 
-            <!-- الاختيارات الثلاثة لطريقة الدفع -->
+            <!-- أزرار طريقة الدفع -->
             <div style="margin-top: 15px; margin-bottom: 5px; font-weight: 800; font-size: 0.9rem; color: var(--main-text);">
                 💳 طريقة الدفع:
             </div>
@@ -512,7 +435,7 @@
                 </button>
             </div>
 
-            <!-- صندوق عرض الرقم وزر النسخ -->
+            <!-- صندوق معلومات الدفع -->
             <div id="paymentInfoBox" style="display: none; background: var(--bg); border: 1.5px dashed var(--border-subtle); padding: 10px 14px; border-radius: 14px; margin-bottom: 15px; align-items: center; justify-content: space-between;">
                 <div>
                     <span id="paymentMethodLabel" style="font-size: 0.8rem; font-weight: 700; color: var(--desc-text); display: block;">رقم التحويل (محفظة إلكترونية):</span>
@@ -591,6 +514,12 @@
             }, intervalTime);
         }
 
+        function isOffersCategory(category) {
+            if (!category) return false;
+            const c = category.trim().toLowerCase();
+            return c.includes('عروض') || c.includes('عرض') || c.includes('عروضنا');
+        }
+
         function isChickenBurgerCategory(category) {
             if (!category) return false;
             const cat = category.trim();
@@ -614,6 +543,20 @@
             return c.includes('بروست') || c.includes('استربس') || c.includes('ستربس') || c.includes('الفرخه الكامله') || c.includes('الفرخة الكاملة') || c.includes('فرخة كاملة') || c.includes('فرخه كامله');
         }
 
+        // دالة المساعدة للتحقق إذا كان السعر عبارة عن نسبة مئوية أم مبلغ
+        function parsePriceData(rawPriceStr) {
+            const str = String(rawPriceStr || '').trim();
+            const isPercent = str.includes('%') || str.includes('خصم');
+            const numericValue = parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
+            
+            return {
+                rawStr: str,
+                isPercent: isPercent,
+                numericValue: numericValue,
+                displayPrice: isPercent ? str : (numericValue ? `${numericValue} ج.م` : str)
+            };
+        }
+
         async function loadMenu() {
             startCreativeCounter();
 
@@ -630,11 +573,11 @@
                     const name = col[1]?.trim();
                     if (!name) return null;
 
-                    const basePrice = parseFloat(col[2]?.trim()) || 0;
+                    const rawPrice = col[2]?.trim() || "0";
                     return { 
                         category: col[0]?.trim() || "عام", 
                         name: name, 
-                        price: basePrice,
+                        rawPrice: rawPrice,
                         desc: col[3]?.trim() || "", 
                         img: `${IMAGES_PATH}${name}.jpg` 
                     };
@@ -671,12 +614,14 @@
         function filterCat(cat, el) {
             if(el) { document.querySelectorAll('.cat-item').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
             
+            const isOffers = isOffersCategory(cat);
             const isChickenBurger = isChickenBurgerCategory(cat);
             const isBeefBurger = isBeefBurgerCategory(cat);
 
             const categoryItems = menuData.filter(i => i.category === cat);
 
             document.getElementById('menuList').innerHTML = categoryItems.map((item, index) => {
+                const priceInfo = parsePriceData(item.rawPrice);
                 const isRizo = isRizoCategory(item.category, item.name);
                 const isBroastOrStrips = isBroastOrStripsCategory(item.category);
 
@@ -697,13 +642,51 @@
                     }
                 }
 
+                /* تصميم كارت قسم العروض الرأسي */
+                if (isOffers) {
+                    return `
+                    <div class="offer-card" data-category="${item.category}" data-raw-price="${item.rawPrice}" data-base-price="${priceInfo.numericValue}" data-price="${priceInfo.numericValue}" data-is-percent="${priceInfo.isPercent}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
+                        <div class="offer-img-box">
+                            <img src="${item.img}" onerror="this.src='${IMAGES_PATH}default.jpg'">
+                            <span class="offer-badge-tag">🔥 عرض خاص</span>
+                        </div>
+                        <div class="offer-info">
+                            <div class="offer-header-row">
+                                <span class="food-name" style="font-size: 1.1rem;">${item.name}</span>
+                                <span class="food-price">${priceInfo.displayPrice}</span>
+                            </div>
+                            ${item.desc ? `<p class="food-desc">${item.desc}</p>` : ''}
+
+                            ${showAddon ? `
+                            <div class="addon-box" onclick="toggleAddonBox(this)">
+                                <div class="addon-content">
+                                    <div class="addon-custom-check">✓</div>
+                                    <span class="addon-label-text">${addonLabel}</span>
+                                </div>
+                                <span class="addon-price-badge">+60 ج.م</span>
+                            </div>
+                            ` : ''}
+
+                            <div class="action-row" style="margin-top: 10px;">
+                                <div class="qty-picker">
+                                    <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
+                                    <span class="qty-val">1</span>
+                                    <button type="button" class="qty-btn" onclick="changeQty(this, -1)">-</button>
+                                </div>
+                                <button class="order-btn" onclick="addToCart(event, this, '${item.name}', '${item.img}')">اطلب العرض</button>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+
+                /* كروت باقي الأقسام العادية */
                 return `
-                <div class="food-card" data-category="${item.category}" data-base-price="${item.price}" data-price="${item.price}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
+                <div class="food-card" data-category="${item.category}" data-raw-price="${item.rawPrice}" data-base-price="${priceInfo.numericValue}" data-price="${priceInfo.numericValue}" data-is-percent="${priceInfo.isPercent}" data-qty="1" data-has-addon="false" data-addon-label="${addonLabel}" data-selected-sauce="" data-selected-flavor="">
                     <div class="item-img-box"><img src="${item.img}" onerror="this.src='${IMAGES_PATH}default.jpg'"></div>
                     <div class="food-info">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
                             <span class="food-name">${item.name}</span>
-                            <span class="food-price">${item.price} ج.م</span>
+                            <span class="food-price">${priceInfo.displayPrice}</span>
                         </div>
                         ${item.desc ? `<p class="food-desc">${item.desc}</p>` : ''}
                         
@@ -750,7 +733,7 @@
         }
 
         function changeQty(btn, delta) {
-            const card = btn.closest('.food-card');
+            const card = btn.closest('.food-card, .offer-card');
             let currentQty = parseInt(card.dataset.qty || 1);
             currentQty += delta;
             if (currentQty < 1) currentQty = 1;
@@ -764,7 +747,7 @@
             const container = btn.parentElement;
             container.querySelectorAll('.sauce-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const card = btn.closest('.food-card');
+            const card = btn.closest('.food-card, .offer-card');
             card.dataset.selectedSauce = sauceName;
         }
 
@@ -772,7 +755,7 @@
             const container = btn.parentElement;
             container.querySelectorAll('.sauce-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const card = btn.closest('.food-card');
+            const card = btn.closest('.food-card, .offer-card');
             card.dataset.selectedFlavor = flavorName;
         }
 
@@ -780,18 +763,24 @@
             box.classList.toggle('selected');
             const isSelected = box.classList.contains('selected');
             
-            const card = box.closest('.food-card');
+            const card = box.closest('.food-card, .offer-card');
+            const isPercent = card.dataset.isPercent === "true";
             const basePrice = parseFloat(card.dataset.basePrice) || 0;
             const finalPrice = isSelected ? (basePrice + 60) : basePrice;
 
             card.dataset.price = finalPrice;
             card.dataset.hasAddon = isSelected ? "true" : "false";
-            card.querySelector('.food-price').innerText = finalPrice + ' ج.م';
+            
+            if (!isPercent) {
+                card.querySelector('.food-price').innerText = finalPrice + ' ج.م';
+            }
         }
 
         function addToCart(e, btn, name, img) {
-            const card = btn.closest('.food-card');
-            const price = parseFloat(card.dataset.price);
+            const card = btn.closest('.food-card, .offer-card');
+            const rawPrice = card.dataset.rawPrice || '';
+            const price = parseFloat(card.dataset.price) || 0;
+            const isPercent = card.dataset.isPercent === "true";
             const qty = parseInt(card.dataset.qty || 1);
             const category = card.dataset.category || '';
             const hasAddon = card.dataset.hasAddon === "true";
@@ -833,6 +822,8 @@
                 cart.push({
                     name: finalName, 
                     price: price, 
+                    rawPrice: rawPrice,
+                    isPercent: isPercent,
                     qty: qty,
                     img: img, 
                     category: category
@@ -841,7 +832,10 @@
 
             btn.innerText = 'تم الطلب ✓'; 
             btn.classList.add('added');
-            setTimeout(() => { btn.innerText = 'اطلب'; btn.classList.remove('added'); }, 2000);
+            setTimeout(() => { 
+                btn.innerText = isOffersCategory(category) ? 'اطلب العرض' : 'اطلب'; 
+                btn.classList.remove('added'); 
+            }, 2000);
 
             const fly = document.createElement('div'); 
             fly.className = 'fly-item'; 
@@ -876,15 +870,22 @@
             currentTotal = 0;
 
             document.getElementById('cartItemsList').innerHTML = cart.map((item, idx) => {
-                const itemTotalPrice = parseFloat(item.price) * item.qty;
-                currentTotal += itemTotalPrice;
+                let displayItemPrice = '';
+                if (item.isPercent) {
+                    displayItemPrice = item.rawPrice;
+                } else {
+                    const itemTotalPrice = item.price * item.qty;
+                    currentTotal += itemTotalPrice;
+                    displayItemPrice = `${itemTotalPrice} ج.م`;
+                }
+
                 return `
                 <div class="cart-item-card">
                     <img src="${item.img}" class="cart-item-img" onerror="this.src='${IMAGES_PATH}default.jpg'">
                     <div class="cart-item-info">
                         <span class="cart-item-name">${item.name}</span>
                         <div class="cart-item-qty-badge">العدد: ${item.qty}</div>
-                        <span class="cart-item-price">${itemTotalPrice} ج.م</span>
+                        <span class="cart-item-price">${displayItemPrice}</span>
                     </div>
                     <span class="remove-btn" onclick="removeFromCart(${idx})">حذف</span>
                 </div>`;
@@ -1035,10 +1036,13 @@
             
             msg += `\n🛒 *تفاصيل الطلب:* \n`;
             msg += `---------------------------------\n`;
-            msg += cart.map((i, index) => `${index + 1}. ${i.name} [العدد: ${i.qty}] - (${i.price * i.qty} ج.م)`).join('\n') + `\n`;
+            msg += cart.map((i, index) => {
+                const itemPriceText = i.isPercent ? `(${i.rawPrice})` : `(${i.price * i.qty} ج.م)`;
+                return `${index + 1}. ${i.name} [العدد: ${i.qty}] - ${itemPriceText}`;
+            }).join('\n') + `\n`;
             msg += `---------------------------------\n\n`;
             
-            msg += `💰 *الإجمالي الكلي:* *${currentTotal} ج.م*\n\n`;
+            msg += `💰 *الإجمالي الكلي النقدي:* *${currentTotal} ج.م*\n\n`;
             msg += `شكراً لاختياركم Dr. Broast! ✨`;
 
             window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
