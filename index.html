@@ -39,25 +39,31 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
-        body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 70px; }
+        body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 80px; }
 
-        /* أيقونة صاحب المطعم الصغيرة المدمجة */
-        .owner-pill-badge {
-            position: absolute;
-            right: 62px;
-            top: 6px;
+        /* أيقونة صاحب المطعم العائمة في مكان مستقل بعيداً عن اللوجو */
+        .owner-floating-pill {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             background: linear-gradient(135deg, #d85000, #ff9800);
             color: #ffffff;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.73rem;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.82rem;
             font-weight: 900;
             display: none;
             align-items: center;
-            gap: 4px;
-            box-shadow: 0 2px 8px rgba(216, 80, 0, 0.25);
+            gap: 6px;
+            box-shadow: 0 6px 20px rgba(216, 80, 0, 0.4);
             cursor: pointer;
-            z-index: 10;
+            z-index: 1500;
+            border: 2px solid #ffffff;
+            animation: pulseFloating 2s infinite ease-in-out;
+        }
+        @keyframes pulseFloating {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
         }
 
         /* --- شاشة الترحيب --- */
@@ -97,7 +103,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.06); border-bottom: 1px solid var(--border-subtle);
         }
 
-        header { display: flex; flex-direction: column; align-items: center; padding: 14px 15px 10px 15px; background: var(--header-bg); position: relative; }
+        header { display: flex; flex-direction: column; align-items: center; padding: 14px 15px 10px 15px; background: var(--header-bg); }
         .header-top { width: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
         .header-logo-container { 
             width: 105px; height: 105px; border-radius: 26px; background: white; padding: 4px; 
@@ -257,6 +263,11 @@
 </head>
 <body>
 
+    <!-- أيقونة صاحب المطعم العائمة في أسفل الشاشة (بعيدة تماماً عن اللوجو) -->
+    <div id="ownerFloatingPill" class="owner-floating-pill" onclick="openAdminPanel()">
+        <span>👑 صاحب المطعم</span>
+    </div>
+
     <!-- شاشة البداية -->
     <div id="splash-screen">
         <div class="loader-content">
@@ -273,12 +284,6 @@
         <header>
             <div class="header-top">
                 <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
-                
-                <!-- الأيقونة الصغيرة المدمجة لصاحب المطعم -->
-                <div id="ownerBadgePill" class="owner-pill-badge" onclick="openAdminPanel()">
-                    <span>👑 صاحب المطعم</span>
-                </div>
-
                 <div class="header-logo-container">
                     <img src="images/logotempo.png" class="header-logo" onerror="this.src='images/default.jpg'">
                 </div>
@@ -388,7 +393,7 @@
                 <div style="text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 2.5rem; margin-bottom: 5px;">🔐</div>
                     <h3 style="font-weight: 900; color: #1d2939; font-size: 1.1rem;">دخول لوحة التحكم</h3>
-                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتأكيد هويتك واستقبال الإشعارات في الهاتف</p>
+                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل هوية صاحب المطعم واستقبال الإشعارات في الهاتف</p>
                 </div>
                 <label>كلمة المرور</label>
                 <input type="password" id="adminPassLoginInput" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyAdminLogin()">
@@ -432,13 +437,13 @@
         </div>
     </div>
 
-    <!-- تسجيل Service Worker للعمل في خلفية الموبايل وشاشة القفل -->
+    <!-- تسجيل Service Worker فورياً -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
                     console.log('SW Registered:', reg.scope);
-                }).catch(err => console.log('SW Registration Fail:', err));
+                }).catch(err => console.log('SW Register Error:', err));
             });
         }
     </script>
@@ -505,12 +510,12 @@
             
             if (!isInitialLoad && data) {
                 if (window.isDeviceOwner && window.isDeviceOwner()) {
-                    // تشغيل الصوت التنبيهي المعتمد
+                    // تشغيل الصوت التنبيهي الأصلي
                     window.playBellNotification();
 
-                    // إرسال إشعار النظام المباشر للموبايل (نفس شكل الصورة تماماً)
+                    // إرسال الإشعار المكتوب في ستارة هاتف الأندرويد مباشرة
                     window.showPushNotification(
-                        "🍗 أوردر جديد - Dr. Broast", 
+                        "أوردر جديد - Dr. Broast 🍗", 
                         "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!"
                     );
                 }
@@ -521,7 +526,7 @@
         });
     </script>
 
-    <!-- المنطق الرئيسي والإشعارات -->
+    <!-- المنطق الرئيسي والتنبيهات -->
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQYAaXvqYs8Mg1uAiFsjL5l0WMx6ttAhWmbIakcuGzzGtzHw0DDGEBEOFSn0h3z8kaikRFJQ1Mt9wJo/pub?output=csv';
         const IMAGES_PATH = "./images/"; 
@@ -537,40 +542,51 @@
 
         let disabledItems = JSON.parse(localStorage.getItem('dr_disabled_items') || '[]');
 
-        /* دالة إرسال إشعار الهاتف الفعلي */
-        window.showPushNotification = async function(title, body) {
+        /* دالة إرسال الإشعار المتوافقة 100% مع أندرويد و Service Worker */
+        window.showPushNotification = function(title, body) {
             if (!("Notification" in window)) return;
 
-            const options = {
-                body: body,
-                icon: "images/logotempo.png",
-                badge: "images/logotempo.png",
-                vibrate: [400, 200, 400, 200, 600],
-                tag: "order-" + Date.now(),
-                renotify: true,
-                requireInteraction: true,
-                data: { url: window.location.href }
+            const triggerNotification = (reg) => {
+                const options = {
+                    body: body,
+                    icon: "images/logotempo.png",
+                    badge: "images/logotempo.png",
+                    vibrate: [400, 200, 400, 200, 600],
+                    tag: "dr-order-" + Date.now(),
+                    renotify: true,
+                    requireInteraction: true,
+                    data: { url: window.location.href }
+                };
+
+                if (reg && reg.showNotification) {
+                    reg.showNotification(title, options);
+                } else if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'TRIGGER_NOTIF',
+                        title: title,
+                        options: options
+                    });
+                }
             };
 
             if (Notification.permission === "granted") {
-                try {
-                    if (navigator.serviceWorker) {
-                        const reg = await navigator.serviceWorker.ready;
-                        if (reg && reg.showNotification) {
-                            await reg.showNotification(title, options);
-                            return;
-                        }
-                    }
-                    new Notification(title, options);
-                } catch(e) {
-                    try { new Notification(title, options); } catch(err) {}
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.ready.then(reg => {
+                        triggerNotification(reg);
+                    }).catch(() => {
+                        triggerNotification(null);
+                    });
                 }
             } else {
-                Notification.requestPermission();
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted' && 'serviceWorker' in navigator) {
+                        navigator.serviceWorker.ready.then(reg => triggerNotification(reg));
+                    }
+                });
             }
         };
 
-        /* التنبيه الصوتي (جرس التنبيه الأصلي المعتمد) */
+        /* التنبيه الصوتي المعتمد */
         function playBellSoundOnce(audioCtx) {
             const now = audioCtx.currentTime;
             [1046.5, 2093.0].forEach(freq => { 
@@ -607,14 +623,14 @@
         };
 
         window.checkOwnerBadge = function() {
-            const ownerBadgePill = document.getElementById('ownerBadgePill');
+            const ownerFloatingPill = document.getElementById('ownerFloatingPill');
             if (window.isDeviceOwner()) {
-                ownerBadgePill.style.display = 'inline-flex';
+                ownerFloatingPill.style.display = 'inline-flex';
                 if ("Notification" in window && Notification.permission !== "granted") {
                     Notification.requestPermission();
                 }
             } else {
-                ownerBadgePill.style.display = 'none';
+                ownerFloatingPill.style.display = 'none';
             }
         };
 
