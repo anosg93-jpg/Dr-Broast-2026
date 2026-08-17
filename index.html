@@ -39,26 +39,36 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
-        body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 90px; }
+        body { background-color: var(--bg); color: var(--main-text); line-height: 1.6; overflow-x: hidden; padding-bottom: 70px; }
 
-        /* أيقونة صاحب المطعم الثابتة في أسفل الشاشة */
-        .owner-bottom-fixed-btn {
-            position: fixed;
-            bottom: 18px;
-            right: 18px;
+        /* حاوية اللوجو والشارة فوقه مباشرة */
+        .logo-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* أيقونة صاحب المطعم البسيطة الثابتة فوق اللوجو */
+        .owner-badge-top {
             background: linear-gradient(135deg, #d85000, #ff9800);
             color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 25px;
-            font-size: 0.82rem;
+            font-size: 0.72rem;
             font-weight: 900;
+            padding: 3px 12px;
+            border-radius: 12px;
             display: none;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 6px 20px rgba(216, 80, 0, 0.45);
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(216, 80, 0, 0.25);
             cursor: pointer;
-            z-index: 1500;
-            border: 2px solid #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            animation: fadeInBadge 0.4s ease forwards;
+        }
+        @keyframes fadeInBadge {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- شاشة الترحيب --- */
@@ -98,13 +108,13 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.06); border-bottom: 1px solid var(--border-subtle);
         }
 
-        header { display: flex; flex-direction: column; align-items: center; padding: 14px 15px 10px 15px; background: var(--header-bg); position: relative; }
+        header { display: flex; flex-direction: column; align-items: center; padding: 12px 15px 10px 15px; background: var(--header-bg); position: relative; }
         .header-top { width: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
         .header-logo-container { 
-            width: 105px; height: 105px; border-radius: 26px; background: white; padding: 4px; 
+            width: 100px; height: 100px; border-radius: 24px; background: white; padding: 4px; 
             box-shadow: 0 8px 25px var(--accent-glow); overflow: hidden; display: flex; align-items: center; justify-content: center; 
         }
-        .header-logo { width: 100%; height: 100%; border-radius: 22px; object-fit: cover; }
+        .header-logo { width: 100%; height: 100%; border-radius: 20px; object-fit: cover; }
         .theme-toggle { position: absolute; right: 10px; top: 0; width: 44px; height: 44px; background: var(--bg); border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; border: none; color: var(--main-text); }
         .cart-trigger-container { position: absolute; left: 10px; top: 0; }
         .cart-trigger { width: 44px; height: 44px; background: var(--bg); border-radius: 14px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: transform 0.2s ease; }
@@ -113,7 +123,7 @@
         .badge { position: absolute; top: -5px; right: -5px; background: var(--accent); color: #ffffff; font-size: 10px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; transform: scale(0); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .badge.show { transform: scale(1); }
         
-        .header-center-addr { margin-top: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--accent-light); border: 1px solid var(--border-subtle); padding: 5px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 800; color: var(--accent); text-align: center; }
+        .header-center-addr { margin-top: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--accent-light); border: 1px solid var(--border-subtle); padding: 4px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 800; color: var(--accent); text-align: center; }
         .header-center-addr .addr-sub { color: var(--desc-text); font-weight: 700; }
 
         .category-nav { display: flex; overflow-x: auto; white-space: nowrap; padding: 12px 16px 14px 16px; gap: 22px; scrollbar-width: none; background: var(--header-bg); }
@@ -258,11 +268,6 @@
 </head>
 <body>
 
-    <!-- أيقونة صاحب المطعم الثابتة في أسفل الشاشة -->
-    <div id="ownerBottomBtn" class="owner-bottom-fixed-btn" onclick="openAdminPanel()">
-        <span>👑 صاحب المطعم</span>
-    </div>
-
     <!-- شاشة البداية -->
     <div id="splash-screen">
         <div class="loader-content">
@@ -279,9 +284,17 @@
         <header>
             <div class="header-top">
                 <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
-                <div class="header-logo-container">
-                    <img src="images/logotempo.png" class="header-logo" onerror="this.src='images/default.jpg'">
+                
+                <!-- الحاوية المركزية للوجو والشارة فوقه -->
+                <div class="logo-wrapper">
+                    <div id="ownerTopBadge" class="owner-badge-top" onclick="openAdminPanel()">
+                        <span>👑 صاحب المطعم</span>
+                    </div>
+                    <div class="header-logo-container">
+                        <img src="images/logotempo.png" class="header-logo" onerror="this.src='images/default.jpg'">
+                    </div>
                 </div>
+
                 <div class="cart-trigger-container">
                     <div class="cart-trigger" onclick="toggleCart(true)" id="cartBtn">
                         <span class="badge" id="cartBadge">0</span>
@@ -388,7 +401,7 @@
                 <div style="text-align: center; margin-bottom: 15px;">
                     <div style="font-size: 2.5rem; margin-bottom: 5px;">🔐</div>
                     <h3 style="font-weight: 900; color: #1d2939; font-size: 1.1rem;">دخول لوحة التحكم</h3>
-                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل وضع صاحب المطعم واستلام إشعارات الهاتف</p>
+                    <p style="font-size: 0.8rem; color: #667085; font-weight: 700;">أدخل كلمة المرور لتفعيل وضع صاحب المطعم واستقبال الإشعارات في الهاتف</p>
                 </div>
                 <label>كلمة المرور</label>
                 <input type="password" id="adminPassLoginInput" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyAdminLogin()">
@@ -432,13 +445,13 @@
         </div>
     </div>
 
-    <!-- تسجيل Service Worker ليعمل في خلفية الهاتف وشاشة القفل -->
+    <!-- تسجيل Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
                     console.log('SW Registered:', reg.scope);
-                }).catch(err => console.log('SW Fail:', err));
+                }).catch(err => console.log('SW Register Fail:', err));
             });
         }
     </script>
@@ -505,12 +518,12 @@
             
             if (!isInitialLoad && data) {
                 if (window.isDeviceOwner && window.isDeviceOwner()) {
-                    // تشغيل الصوت التنبيهي الأصلي
+                    // تشغيل الصوت التنبيهي
                     window.playBellNotification();
 
-                    // إرسال الإشعار لستارة إشعارات الموبايل وشاشة القفل مباشرة
-                    window.triggerMobileSystemNotification(
-                        "أوردر جديد - Dr. Broast 🍗", 
+                    // إرسال الإشعار لستارة إشعارات الهاتف وشاشة القفل مباشرة
+                    window.showAndroidSystemNotification(
+                        "🍗 أوردر جديد - Dr. Broast", 
                         "🔔 هناك أوردر جديد تم تأكيده للتو من العميل!"
                     );
                 }
@@ -537,17 +550,17 @@
 
         let disabledItems = JSON.parse(localStorage.getItem('dr_disabled_items') || '[]');
 
-        /* دالة إرسال إشعار النظام الحقيقي للهاتف */
-        window.triggerMobileSystemNotification = function(title, body) {
+        /* دالة إرسال إشعار النظام المباشر المتوافقة 100% مع أندرويد */
+        window.showAndroidSystemNotification = async function(title, body) {
             if (!("Notification" in window)) return;
 
-            const sendNotification = (reg) => {
+            const sendPush = (reg) => {
                 const options = {
                     body: body,
                     icon: "images/logotempo.png",
                     badge: "images/logotempo.png",
-                    vibrate: [400, 200, 400, 200, 600],
-                    tag: "dr-broast-order-" + Date.now(),
+                    vibrate: [500, 200, 500, 200, 600],
+                    tag: "order-" + Date.now(),
                     renotify: true,
                     requireInteraction: true,
                     data: { url: window.location.href }
@@ -557,7 +570,7 @@
                     reg.showNotification(title, options);
                 } else if (navigator.serviceWorker && navigator.serviceWorker.controller) {
                     navigator.serviceWorker.controller.postMessage({
-                        type: 'SHOW_ORDER_NOTIF',
+                        type: 'TRIGGER_ORDER_NOTIF',
                         title: title,
                         options: options
                     });
@@ -566,22 +579,18 @@
 
             if (Notification.permission === "granted") {
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.ready.then(reg => {
-                        sendNotification(reg);
-                    }).catch(() => {
-                        sendNotification(null);
-                    });
+                    navigator.serviceWorker.ready.then(reg => sendPush(reg)).catch(() => sendPush(null));
                 }
             } else {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted' && 'serviceWorker' in navigator) {
-                        navigator.serviceWorker.ready.then(reg => sendNotification(reg));
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted' && 'serviceWorker' in navigator) {
+                        navigator.serviceWorker.ready.then(reg => sendPush(reg));
                     }
                 });
             }
         };
 
-        /* التنبيه الصوتي المعتمد */
+        /* التنبيه الصوتي الأصلي المعتمد */
         function playBellSoundOnce(audioCtx) {
             const now = audioCtx.currentTime;
             [1046.5, 2093.0].forEach(freq => { 
@@ -618,14 +627,14 @@
         };
 
         window.checkOwnerBadge = function() {
-            const ownerBtn = document.getElementById('ownerBottomBtn');
+            const ownerBadge = document.getElementById('ownerTopBadge');
             if (window.isDeviceOwner()) {
-                ownerBtn.style.display = 'inline-flex';
+                ownerBadge.style.display = 'inline-flex';
                 if ("Notification" in window && Notification.permission !== "granted") {
                     Notification.requestPermission();
                 }
             } else {
-                ownerBtn.style.display = 'none';
+                ownerBadge.style.display = 'none';
             }
         };
 
