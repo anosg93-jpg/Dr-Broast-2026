@@ -1,5 +1,5 @@
 // قم بتغيير رقم الإصدار هنا (مثلاً v1.1 أو v2.0) كلما قمت برفع تعديلات جديدة في كود index.html
-const CACHE_NAME = 'dr-broast-v40.0';
+const CACHE_NAME = 'dr-broast-v41.0';
 
 // الملفات الأساسية للتخزين المؤقت للعمل بدون إنترنت وبسرعة فائقة
 const STATIC_ASSETS = [

@@ -244,7 +244,7 @@
         .user-fields input:focus { border-color: var(--accent); }
         .submit-btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 18px; width: 100%; font-weight: 900; cursor: pointer; font-size: 1rem; box-shadow: 0 6px 18px var(--accent-glow); margin-top: 5px; }
 
-        /* مودال واجهة الإدارة والتحكم (معدل بالكامل لضمان السكرول السلس) */
+        /* مودال واجهة الإدارة والتحكم */
         .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 12px; backdrop-filter: blur(4px); }
         .admin-card { 
             background: #f3f4f8; width: 100%; max-width: 440px; border-radius: 28px; 
@@ -268,7 +268,7 @@
         /* منطقة التمرير المرنة لسجل الطلبات والأصناف */
         .admin-scroll-area { 
             overflow-y: auto !important; 
-            -webkit-overflow-scrolling: touch;
+            -webkit-overflow-scrolling: touch; 
             flex: 1; 
             padding: 4px 2px 20px 2px; 
             scrollbar-width: thin; 
@@ -446,7 +446,7 @@
         </div>
     </div>
 
-    <!-- مودال واجهة الإدارة والتحكم (معدل بالكامل لضمان السكرول والتصفح) -->
+    <!-- مودال واجهة الإدارة والتحكم -->
     <div class="admin-modal" id="adminModal" onclick="if(event.target==this) closeAdmin()">
         <div class="admin-card">
             <div class="admin-header">
@@ -471,7 +471,7 @@
                 <div class="admin-scroll-area" id="adminItemsList"></div>
             </div>
 
-            <!-- تبويب سجل الطلبات (تمرير سلس وسريع) -->
+            <!-- تبويب سجل الطلبات -->
             <div id="tabOrdersContent" style="display: none; flex-direction: column; flex: 1; overflow: hidden;">
                 <div class="admin-scroll-area" id="adminOrdersList"></div>
             </div>
@@ -1097,25 +1097,41 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
-            db.ref('orders').push(orderData).then(() => {
+            let msg = `✨ *طلب جديد من مطعم Dr. Broast* ✨\n\n👤 *الاسم:* ${n}\n📱 *الهاتف:* ${p}\n📋 *نوع الطلب:* ${typeLabel}\n💳 *طريقة الدفع:* ${payLabel}\n`;
+            if (selectedOrderType === 'delivery') msg += `📍 *العنوان:* ${a}\n`;
+            msg += `\n🛒 *تفاصيل الطلب:* \n---------------------------------\n${itemsDetails}\n---------------------------------\n\n`;
+            msg += `💰 *الإجمالي الكلي:* *${currentTotal} ج.م*\n\nشكراً لاختياركم Dr. Broast! ✨`;
+
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${WA_PHONE}&text=${encodeURIComponent(msg)}`;
+
+            const isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+            const finalizeAndRedirect = () => {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "تأكيد الطلب عبر واتساب";
-                
-                let msg = `✨ *طلب جديد من مطعم Dr. Broast* ✨\n\n👤 *الاسم:* ${n}\n📱 *الهاتف:* ${p}\n📋 *نوع الطلب:* ${typeLabel}\n💳 *طريقة الدفع:* ${payLabel}\n`;
-                if (selectedOrderType === 'delivery') msg += `📍 *العنوان:* ${a}\n`;
-                msg += `\n🛒 *تفاصيل الطلب:* \n---------------------------------\n${itemsDetails}\n---------------------------------\n\n`;
-                msg += `💰 *الإجمالي الكلي:* *${currentTotal} ج.م*\n\nشكراً لاختياركم Dr. Broast! ✨`;
 
                 cart = [];
                 updateCart();
                 toggleCart(false);
 
-                window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`);
-            }).catch(err => {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "تأكيد الطلب عبر واتساب";
-                alert("حدث خطأ أثناء حفظ الطلب، يرجى المحاولة مرة أخرى.");
-            });
+                if (isStandalonePWA) {
+                    window.location.href = whatsappUrl;
+                } else {
+                    const opened = window.open(whatsappUrl, '_blank');
+                    if (!opened) {
+                        window.location.href = whatsappUrl;
+                    }
+                }
+            };
+
+            db.ref('orders').push(orderData)
+                .then(() => {
+                    finalizeAndRedirect();
+                })
+                .catch(err => {
+                    console.error("Firebase push error:", err);
+                    finalizeAndRedirect();
+                });
         }
 
         /* --- لوحة تحكم صاحب المطعم --- */
